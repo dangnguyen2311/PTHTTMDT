@@ -1,5 +1,6 @@
 package com.example.btl_tmdt.service;
 
+import com.example.btl_tmdt.dao.ProductDao;
 import com.example.btl_tmdt.model.Category;
 import com.example.btl_tmdt.model.Product;
 import com.example.btl_tmdt.repository.CategoryRepo;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -36,7 +38,7 @@ public class ProductService {
     }
 
     public void createProduct(Product product) {
-        Category category = categoryRepo.findById(product.getCategory().getCategoryId()).get();
+        Category category = categoryRepo.findById(product.getCategory().getId()).get();
         product.setCategory(category);
         prodRepo.save(product);
     }
@@ -51,6 +53,13 @@ public class ProductService {
         prodRepo.delete(product);
 
     }
+    public ProductDao getProductByName(String productName) {
+        Product product = prodRepo.findProductByProdName(productName).orElse(null);
+        if(product != null) {
+            return product.toDao();
+        }
+        return null;
+    }
 
 //    public void deleteProductById(Product product){
 //        prodRepo.deleteById(product.getProdId());
@@ -63,7 +72,7 @@ public class ProductService {
 
     public void editProduct(Product product, String id) {
         Product productInDB = prodRepo.getProductByProdId(id);
-        Category category = categoryRepo.findById(productInDB.getCategory().getCategoryId()).get();
+        Category category = categoryRepo.findById(productInDB.getCategory().getId()).get();
 
         productInDB.setCategory(category);
         productInDB.setProdDescription(product.getProdDescription());

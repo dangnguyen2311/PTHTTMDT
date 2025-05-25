@@ -1,29 +1,48 @@
 package com.example.btl_tmdt.payment;
 
 import com.example.btl_tmdt.response.ResponseObject;
+import com.example.btl_tmdt.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/payment")
 @RequiredArgsConstructor
 public class PaymentController {
+    @Autowired
     private final PaymentService paymentService;
-    @GetMapping("/vn-pay")
-    public ResponseObject<PaymentDTO.VNPayResponse> pay(HttpServletRequest request) {
-        return new ResponseObject<>(HttpStatus.OK, "Success", paymentService.createVnPayPayment(request));
+    @Autowired
+    private OrderService orderService;
+    @PostMapping("/vn-pay")
+    public ResponseObject<PaymentDTO.VNPayResponse> pay(@RequestBody PaymentRequest paymentRequest,
+                                                        HttpServletRequest request) {
+        return new ResponseObject<>(HttpStatus.OK, "Successssssss", paymentService.createVnPayPayment(paymentRequest.getAmount(),
+                paymentRequest.getBankCode(),
+                paymentRequest.getNote(),
+                request
+        ));
     }
     @GetMapping("/vn-pay-callback")
-    public ResponseObject<PaymentDTO.VNPayResponse> payCallbackHandler(HttpServletRequest request) {
+    public ResponseEntity<ResponseObject<PaymentDTO.VNPayResponse>> payCallbackHandler(HttpServletRequest request) {
         String status = request.getParameter("vnp_ResponseCode");
-        if (status.equals("00")) {
-            return new ResponseObject<>(HttpStatus.OK, "Success", new PaymentDTO.VNPayResponse("00", "Success", ""));
+
+        if ("00".equals(status)) {
+            PaymentDTO.VNPayResponse response = PaymentDTO.VNPayResponse.builder()
+                    .code("00")
+                    .message("Success")
+                    .paymentUrl("")
+                    .build();
+            //Update order status in DB
+
+            return ResponseEntity.ok(new ResponseObject<>(HttpStatus.OK, "Success", response));
         } else {
-            return new ResponseObject<>(HttpStatus.BAD_REQUEST, "Failed", null);
+            return ResponseEntity.badRequest().body(
+                    new ResponseObject<>(HttpStatus.BAD_REQUEST, "Failed", null));
         }
     }
+
 }

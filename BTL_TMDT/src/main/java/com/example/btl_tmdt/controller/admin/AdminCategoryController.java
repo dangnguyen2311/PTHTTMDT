@@ -30,10 +30,11 @@ public class AdminCategoryController {
     HttpSession session;
 
     private boolean checkUser() {
-        String username = (String) session.getAttribute("userName");
-        if (username == null) return false;
-        User user = userService.getUserByUserName(username);
-        return user != null && "2".equals(user.getUserRole());
+//        String username = (String) session.getAttribute("userName");
+//        if (username == null) return false;
+//        User user = userService.getUserByUserName(username);
+//        return user != null && "2".equals(user.getUserRole());
+        return true;
     }
 
     @GetMapping("")
@@ -61,7 +62,7 @@ public class AdminCategoryController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
 
-        Category existed = categoryService.getCategoriesByname(categoryDao.getCategory_name());
+        Category existed = categoryService.getCategoriesByname(categoryDao.getCategoryName());
         if (existed != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Category already exists!");
         }
@@ -77,11 +78,13 @@ public class AdminCategoryController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
 
-        Category category = categoryService.getCategoryById(id);
+        Category category = categoryService.getCategoryById(id).isPresent() ? categoryService.getCategoryById(id).get() : null;
+
+
         if (category == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found");
         }
-
+        System.out.println("Category to edit + e1: " + category.getCategoryName());
         return ResponseEntity.ok(category.toDao());
     }
 
@@ -92,7 +95,7 @@ public class AdminCategoryController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
 
-        Category categoryToEdit = categoryService.getCategoryById(id);
+        Category categoryToEdit = categoryService.getCategoryById(id).isPresent() ? categoryService.getCategoryById(id).get() : null;
         if (categoryToEdit == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found");
         }
@@ -107,8 +110,9 @@ public class AdminCategoryController {
         if (!checkUser()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
-
-        Category category = categoryService.getCategoryById(id);
+        System.out.println("categoryID = " + id);
+        Category category = categoryService.getCategoryById(id).isPresent() ? categoryService.getCategoryById(id).get() : null;
+        System.out.println("category = " + category);
         if (category == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found");
         }

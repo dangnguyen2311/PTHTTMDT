@@ -124,13 +124,13 @@ public class CheckOutController {
         ));
     }
 
-    @GetMapping("/my-order/detail/{id}")
-    public ResponseEntity<?> orderDetail(HttpSession session, @PathVariable("id") String id) {
+    @GetMapping("/my-order/detail/{orderId}")
+    public ResponseEntity<?> orderDetail(HttpSession session, @PathVariable("orderId") String orderId) {
         User user = userService.getUserByUserName((String) session.getAttribute("userName"));
         if (user == null)
             return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
 
-        Order order = orderService.getOrderById(id);
+        Order order = orderService.getOrderById(orderId);
 
         List<CategoryDao> categoryDaos = categoryService.getCategories()
                 .stream().map(Category::toDao).collect(Collectors.toList());

@@ -49,6 +49,12 @@ public class OrderService {
         return orderRepo.findByUser(userToDelete);
     }
 
+    public void updateOrder(OrderDao orderDaotoReturn) {
+        Order order = orderRepo.findByOrderId(orderDaotoReturn.getOrderId());
+        order.setStatus(orderDaotoReturn.getStatus());
+        orderRepo.save(order);
+    }
+
 //    public List<ProductDao> getProductsInOder(String order_id){
 //        OrderDao orderDao = orderRepo.getOrdersByOrder_id(order_id).toDao();
 //        List<ProductInOrder> productsInOrder = productInOrderRepo.getProductInOrdersByOrder(orderDao.toModel());

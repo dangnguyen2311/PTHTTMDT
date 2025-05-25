@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryDao {
-    private String category_id;
-    private String category_name;
-    private String category_description;
+    private String id;
+    private String categoryName;
+    private String categoryDescription;
 
     public Category toModel() {
-        return new Category(category_id, category_name, category_description);
+        return new Category(id, categoryName, categoryDescription);
     }
 }

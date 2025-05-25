@@ -38,7 +38,7 @@ public class ProductController {
                     .map(Product::toDao)
                     .filter(e -> productName == null || e.getProdName().toLowerCase().contains(productName.toLowerCase()))
                     .collect(Collectors.toList());
-
+            System.out.println("Number of products by Category: " + productDaos.size());
             Map<String, Object> response = new HashMap<>();
             response.put("categoryDaos", categoryDaos);
             response.put("productDaos", productDaos);
