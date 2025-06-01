@@ -8,6 +8,8 @@ function Sidebar() {
         { label: 'Products', base: 'product' },
         { label: 'Carts', base: 'cart' },
         { label: 'Orders', base: 'order' },
+        { label: 'Reviews', base: 'review'},
+        { label: 'Return', base: 'return'},
     ];
     return (
         <aside className="main-sidebar sidebar-light-green elevation-4">
@@ -30,7 +32,7 @@ function Sidebar() {
                                             <p>List</p>
                                         </Link>
                                     </li>
-                                    {item.base !== 'cart' && item.base !== 'order' && (
+                                    {item.base !== 'cart' && item.base !== 'order' && item.base !== 'return' && item.base !== 'review' && (
                                         <li className="nav-item">
                                             <Link to={`/${item.base}/add-${item.base}`} className="nav-link">
                                                 <i className="far fa-circle nav-icon"></i>

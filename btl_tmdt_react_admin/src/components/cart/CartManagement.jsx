@@ -40,7 +40,7 @@ const CartManagement = () => {
                                 <div className="col-sm-6">
                                     <ol className="breadcrumb float-sm-right">
                                         <li className="breadcrumb-item">
-                                            <Link to="/admin">Home</Link>
+                                            <Link to="/">Home</Link>
                                         </li>
                                         <li className="breadcrumb-item active">Carts</li>
                                     </ol>
@@ -68,7 +68,7 @@ const CartManagement = () => {
                                                 <td>{cartDao.userDao.userName}</td>
                                                 <td>
                                                     <Link
-                                                        to={`/admin/cart/cart-item/${cartDao.id}`}
+                                                        to={`/cart/cart-item/${cartDao.id}`}
                                                         className="btn btn-success"
                                                     >
                                                         List product

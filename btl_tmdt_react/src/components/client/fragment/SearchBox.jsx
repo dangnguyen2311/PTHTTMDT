@@ -8,12 +8,12 @@ export const SearchBox = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (searchTerm.trim()) {
-            navigate(`/search?query=${encodeURIComponent(searchTerm)}`, {replace: true});
+            navigate(`/api/v1/products/search?query=${encodeURIComponent(searchTerm)}`, {replace: true});
         }
     };
 
     return (
-        <div className="search-model-box">
+        <div className="search-model-box d-block">
             <div className="h-100 d-flex align-items-center justify-content-center">
                 <div className="search-close-btn">+</div>
                 <form onSubmit={handleSubmit} className="search-model-form">

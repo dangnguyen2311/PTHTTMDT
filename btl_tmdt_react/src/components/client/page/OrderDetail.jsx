@@ -1,21 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import Header from "./Header.jsx";
-import {Footer} from "./Footer.jsx";
-import {SearchBox} from "./SearchBox.jsx";
+import {Link, useParams} from 'react-router-dom';
+import Header from "../fragment/Header.jsx";
+import {Footer} from "../fragment/Footer.jsx";
+import {SearchBox} from "../fragment/SearchBox.jsx";
 
 const OrderDetail = () => {
-    const { id } = useParams(); // lấy orderId từ URL
+    const { orderId } = useParams(); // get orderorderId from URL
     const [products, setProducts] = useState([]);
     const [total, setTotal] = useState(0);
+    const [status, setStatus] = useState('');
+    // const navigate = useNavigate();
 
     useEffect(() => {
-        fetch(`/api/v1/checkout/my-order/detail/${id}`)
+        fetch(`/api/v1/order/detail/${orderId}`)
             .then((res) => {
                 if (!res.ok) throw new Error('Không thể lấy chi tiết đơn hàng');
                 return res.json();
             })
             .then((data) => {
+                console.log("Soos luong: " + data.productInOrderDaos.length);
+                setStatus(data.orderDao?.status || '');
                 setProducts(data.productInOrderDaos || []);
                 setTotal(data.orderDao?.total || 0);
             })
@@ -23,7 +27,7 @@ const OrderDetail = () => {
                 console.error(err);
                 alert('Lỗi khi tải chi tiết đơn hàng');
             });
-    }, [id]);
+    }, [orderId]);
 
     const formatCurrency = (number) => {
         return Number(number).toLocaleString('vi-VN') + ' VNĐ';
@@ -31,7 +35,7 @@ const OrderDetail = () => {
 
     return (
         <>
-            <Header userName={localStorage.getItem("userName")} categoryDaos={[]}/>
+            <Header userName={localStorage.getItem("userName")} categoryDaos={JSON.parse(localStorage.getItem("categoryDaos") || "[]")}/>
             <main>
                 <div className="hero-cap text-center">
                     <h2 style={{margin: '40px auto'}}>LIST PRODUCT IN YOUR ORDER</h2>
@@ -61,7 +65,7 @@ const OrderDetail = () => {
                                                     <div className="media">
                                                         <div className="d-flex">
                                                             <img src={prod.prodImg} alt={prod.prodName} style={{
-                                                                width: '80px',
+                                                                worderIdth: '80px',
                                                                 height: '80px',
                                                                 objectFit: 'cover'
                                                             }}/>
@@ -88,6 +92,15 @@ const OrderDetail = () => {
                                     </tr>
                                     </tbody>
                                 </table>
+                                <div className="checkout_btn_inner float-right">
+                                    {/*<button className="btn_3 checkout_btn_1 mx-3" onClick={() => navigate('/my-order/return/' + orderId)}>*/}
+                                        {/*Return*/}
+                                        <Link to={"/my-order/return/" + orderId}
+                                              className={status === 'returned' ? `d-none genric-btn circle medium danger py-2` :`genric-btn circle medium danger py-2`}>
+                                            Return
+                                        </Link>
+                                    {/*</button>*/}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -100,7 +113,7 @@ const OrderDetail = () => {
                 </div>
             </main>
             <Footer/>
-            <SearchBox/>
+            {/*<SearchBox/>*/}
         </>
 
     );

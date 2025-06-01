@@ -23,8 +23,9 @@ public class OrderDao {
 
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date order_time;
+    private String status;
 
     public Order toModel() {
-        return new Order(orderId, userDao != null ? userDao.toModel() : null, address, phone, fullName, total, order_time);
+        return new Order(orderId, userDao != null ? userDao.toModel() : null, address, phone, fullName, total, order_time, status);
     }
 }

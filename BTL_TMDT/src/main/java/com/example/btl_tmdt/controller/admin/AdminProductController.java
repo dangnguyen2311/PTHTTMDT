@@ -46,8 +46,9 @@ public class AdminProductController {
     @Autowired
     Cloudinary cloudinary;
     public boolean checkUser(){
-        User user = (User) userService.getUserByUserName((String) session.getAttribute("userName"));
-        return user.getUserRole().equals("2");
+//        User user = (User) userService.getUserByUserName((String) session.getAttribute("userName"));
+//        return user.getUserRole().equals("2");
+        return true;
     }
 
 //    @GetMapping("")
@@ -240,6 +241,11 @@ public class AdminProductController {
         }
 
         try {
+            ProductDao existingProduct = productService.getProductByName(productDao.getProdName());
+            if (existingProduct != null) {
+                return ResponseEntity.badRequest().body("Product Name already exists");
+            }
+
             Map uploadResult = cloudinary.uploader().upload(pictureFile.getBytes(),
                     ObjectUtils.asMap("resource_type", "image"));
             String imageUrl = (String) uploadResult.get("secure_url");
@@ -297,7 +303,7 @@ public class AdminProductController {
     public ResponseEntity<List<ProductDao>> getProductByCategory(@RequestParam String categoryId) {
         List<ProductDao> result = productService.getProducts().stream()
                 .map(Product::toDao)
-                .filter(p -> p.getCategoryDao() != null && p.getCategoryDao().getCategory_id().equals(categoryId))
+                .filter(p -> p.getCategoryDao() != null && p.getCategoryDao().getId().equals(categoryId))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(result);
     }

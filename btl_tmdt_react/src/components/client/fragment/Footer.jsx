@@ -9,7 +9,7 @@ export const Footer = () => {
                                 <div className="single-footer-caption mb-50">
                                     <div className="single-footer-caption mb-30">
                                         <div className="footer-logo">
-                                            <a href="index.html"><img
+                                            <a href="../../../../index.html"><img
                                                 src="/assets/img/logo/logo2_footer.png" alt=""/></a>
                                         </div>
                                         <div className="footer-tittle">

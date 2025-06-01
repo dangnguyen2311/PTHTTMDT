@@ -1,16 +1,9 @@
 package com.example.btl_tmdt.controller.admin;
 
-import com.example.btl_tmdt.dao.OrderDao;
-import com.example.btl_tmdt.dao.UserDao;
-import com.example.btl_tmdt.model.Cart;
-import com.example.btl_tmdt.model.Order;
-import com.example.btl_tmdt.model.Product;
-import com.example.btl_tmdt.model.User;
+import com.example.btl_tmdt.dao.*;
+import com.example.btl_tmdt.model.*;
 import com.example.btl_tmdt.repository.UserRepo;
-import com.example.btl_tmdt.service.CartService;
-import com.example.btl_tmdt.service.OrderService;
-import com.example.btl_tmdt.service.ProductService;
-import com.example.btl_tmdt.service.UserService;
+import com.example.btl_tmdt.service.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,6 +28,12 @@ public class AdminController {
     private CartService cartService;
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private CategoryService categoryService;
+    @Autowired
+    private ReviewProductService reviewProductService;
+    @Autowired
+    private ReturnOrderService returnOrderService;
 
     @Autowired
     HttpSession session;
@@ -54,12 +53,19 @@ public class AdminController {
         List<Cart> carts = cartService.getAllCart();
         List<User> users = userService.getUsers();
         List<OrderDao> orders = orderService.getOrders();
+        List<CategoryDao> categoryDaos = categoryService.getCategories().stream().map(Category::toDao).toList();
+        List<ReviewProductDao> reviewProductDaos = reviewProductService.getAllReviews().stream().filter(review -> !"deleted".equalsIgnoreCase(review.getStatus())).map(ReviewProduct::toDao).toList();
+        List<ReturnOrderDao> returnOrderDaos = returnOrderService.getAllReturnOrders();
+
 
         Map<String, Integer> dashboardData = new HashMap<>();
         dashboardData.put("numberOfProduct", products.size());
         dashboardData.put("numberOfCart", carts.size());
         dashboardData.put("numberOfUser", users.size());
         dashboardData.put("numberOfOrder", orders.size());
+        dashboardData.put("numberOfCategory", categoryDaos.size());
+        dashboardData.put("numberOfReview", reviewProductDaos.size());
+        dashboardData.put("numberOfReturnOrder", returnOrderDaos.size());
 
         return ResponseEntity.ok(dashboardData);
     }

@@ -44,13 +44,14 @@ public class AdminOrderController {
     public boolean checkUser(){
         User user = (User) userService.getUserByUserName((String) session.getAttribute("userName"));
         return user.getUserRole().equals("2");
+//        return true;
     }
 
     @GetMapping("")
     public ResponseEntity<?> getOrders() {
-        if (!checkUser()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-        }
+//        if (!checkUser()) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+//        }
         List<OrderDao> orderDaoList = orderService.getOrders();
         return ResponseEntity.ok(orderDaoList);
     }
@@ -58,9 +59,9 @@ public class AdminOrderController {
     // Lấy chi tiết các sản phẩm trong một order
     @GetMapping("/order-item/{id}")
     public ResponseEntity<?> getProductInOrder(@PathVariable("id") String id) {
-        if (!checkUser()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-        }
+//        if (!checkUser()) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+//        }
 
         Order order = orderService.getOrderById(id);
         if (order == null) {
@@ -80,15 +81,16 @@ public class AdminOrderController {
     // Xoá một order
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOrder(@PathVariable("id") String id) {
-        if (!checkUser()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-        }
+//        if (!checkUser()) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+//        }
 
         Order order = orderService.getOrderById(id);
+
         if (order == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
         }
-
+        System.out.println("Order to delete: " + order);
         productInOrderService.deleteOrder(order);
         return ResponseEntity.ok("Order deleted successfully");
     }

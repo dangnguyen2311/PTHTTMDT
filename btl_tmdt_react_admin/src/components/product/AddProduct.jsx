@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from "../fragment/Navbar.jsx";
 import Sidebar from "../fragment/Sidebar.jsx";
-import {Link} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 const AddProduct = () => {
     const [product, setProduct] = useState({
@@ -10,15 +10,17 @@ const AddProduct = () => {
         prodPrice: '',
         prodDescription: '',
         prodNsx: '',
-        categoryDao: { category_id: '' }
+        categoryDao: { id: '' }
     });
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     const [categories, setCategories] = useState([]);
     const [pictureFile, setPictureFile] = useState(null);
 
     useEffect(() => {
         // Gọi API lấy danh sách category
-        axios.put('/admin/product') // <-- đổi đường dẫn nếu khác
+        axios.get('/api/admin/category') // <-- đổi đường dẫn nếu khác
             .then(res => setCategories(res.data))
             .catch(err => console.error(err));
     }, []);
@@ -55,27 +57,30 @@ const AddProduct = () => {
 
         const formData = new FormData();
         formData.append('prodName', product.prodName);
-        formData.append('prodPrice', product.prodPrice);
         formData.append('prodDescription', product.prodDescription);
+        formData.append('prodPrice', product.prodPrice);
         formData.append('prodNsx', product.prodNsx);
-        formData.append('categoryDao.category_id', product.categoryDao.category_id);
+        formData.append('categoryDao.id', product.categoryDao.id);
         formData.append('pictureFile', pictureFile);
 
-        axios.post('/admin/product', formData)
+        axios.post('/api/admin/product', formData)
             .then(() => {
                 alert("Product created successfully");
+
                 setProduct({
                     prodName: '',
                     prodPrice: '',
                     prodDescription: '',
                     prodNsx: '',
-                    categoryDao: { category_id: '' }
+                    categoryDao: { id: '' }
                 });
                 setPictureFile(null);
+                navigate("/product")
             })
             .catch(err => {
-                console.error(err);
-                alert("Error creating product");
+                setError(err.response.data);
+                console.error(err.response.data);
+                // alert("Error creating product");
             });
     };
 
@@ -87,12 +92,18 @@ const AddProduct = () => {
                 <div className="content-header mb-4">
                     <h1>Add new product</h1>
                     <ol className="breadcrumb">
-                        <li className="breadcrumb-item"><Link to="/">Home</Link></li>
+                        <li className="breadcrumb-item"><a href="/">Home</a></li>
                         <li className="breadcrumb-item active">Add new product</li>
                     </ol>
                 </div>
 
                 <div className="card card-info">
+                    {
+                        error &&
+                        <div className="card-header bg-red">
+                            <h3 className="card-title">{error}</h3>
+                        </div>
+                    }
                     <div className="card-header">
                         <h3 className="card-title">Product Information</h3>
                     </div>
@@ -108,12 +119,12 @@ const AddProduct = () => {
 
                             <div className="form-group">
                                 <label>Category</label>
-                                <select name="categoryDao.category_id" className="form-control"
-                                        value={product.categoryDao.category_id} onChange={handleChange} required>
+                                <select name="categoryDao.id" className="form-control"
+                                        value={product.categoryDao.id} onChange={handleChange} required>
                                     <option value="">-- Select Category --</option>
                                     {categories.map(cat => (
-                                        <option key={cat.category_id} value={cat.category_id}>
-                                            {cat.category_name}
+                                        <option key={cat.id} value={cat.id}>
+                                            {cat.categoryName}
                                         </option>
                                     ))}
                                 </select>

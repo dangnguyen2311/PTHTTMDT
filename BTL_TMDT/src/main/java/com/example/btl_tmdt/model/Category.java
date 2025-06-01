@@ -13,11 +13,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 public class Category {
     @Id
-    private String categoryId;
+    private String id;
     private String categoryName;
     private String categoryDescription;
 
     public CategoryDao toDao(){
-        return new CategoryDao(categoryId, categoryName, categoryDescription);
+        return new CategoryDao(id, categoryName, categoryDescription);
     }
 }

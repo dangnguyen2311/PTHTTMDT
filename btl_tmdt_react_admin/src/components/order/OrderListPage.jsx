@@ -79,18 +79,21 @@ const OrderListPage = () => {
                                         {orderDaos.map((order, index) => (
                                             <tr key={index}>
                                                 <td>{order.userDao?.userName}</td>
-                                                <td>{order.fullName}</td>
+                                                <td>{order.userDao?.userFullName}</td>
                                                 <td>{order.address}</td>
                                                 <td>{order.phone}</td>
                                                 <td>{order.order_time}</td>
                                                 <td>{order.total.toLocaleString('vi-VN')} VNĐ</td>
                                                 <td>
-                                                    <a
-                                                        href={`/admin/order/order-item/${order.orderId}`}
-                                                        className="btn btn-success btn-sm mr-2"
-                                                    >
+                                                    <Link to={`/order/order-item/${order.orderId}`} className="btn btn-success btn-sm mr-2">
                                                         List product
-                                                    </a>
+                                                    </Link>
+                                                    {/*<a*/}
+                                                    {/*    href={`/admin/order/order-item/${order.orderId}`}*/}
+                                                    {/*    className="btn btn-success btn-sm mr-2"*/}
+                                                    {/*>*/}
+                                                    {/*    List product*/}
+                                                    {/*</a>*/}
                                                     <button
                                                         className="btn btn-danger btn-sm"
                                                         onClick={() => handleDelete(order.orderId)}

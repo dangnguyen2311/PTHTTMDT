@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from "./Header.jsx";
-import {Footer} from "./Footer.jsx";
-import {SearchBox} from "./SearchBox.jsx";
+import Header from "../fragment/Header.jsx";
+import {Footer} from "../fragment/Footer.jsx";
+import {SearchBox} from "../fragment/SearchBox.jsx";
 
 const Checkout = () => {
     const navigate = useNavigate();
@@ -50,47 +50,96 @@ const Checkout = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // Xử lý submit form
+    const handleInfo = () => {
+        const { fullName, phone, email, address } = formData;
+
+        if (!fullName.trim() || !phone.trim() || !email.trim() || !address.trim()) {
+            console.log(error);
+            setError("Vui lòng điền đầy đủ thông tin: Họ tên, Số điện thoại, Email và Địa chỉ.");
+            return false;
+        }
+
+        return true;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!handleInfo()) return;
+
         try {
-            const res = await fetch('/api/v1/checkout/order', {
+            const resOrder = await fetch('/api/v1/checkout/order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify(formData),
             });
-            if (!res.ok) throw new Error((await res.json()).error || 'Lỗi khi đặt hàng');
-            const data = await res.json();
-            alert(data.message || 'Đặt hàng thành công!');
-            navigate('/my-cart'); // Quay lại giỏ hàng
-        } catch (err) {
+
+            if (!resOrder.ok) {
+                const errorData = await resOrder.json();
+                throw new Error(errorData.error || 'Lỗi khi đặt hàng');
+            }
+
+            const orderData = await resOrder.json();
+            console.log('Đặt hàng thành công:', orderData.message);
+
+            // Call API VNPay
+            const resPayment = await fetch('/api/v1/payment/vn-pay', {
+                method: 'POST',
+                headers:{
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    amount: totalPrice + 50000,
+                    bankCode: 'NCB',
+                    note: formData.orderNotes,
+                })
+            });
+
+            if (!resPayment.ok) {
+                const errData = await resPayment.json();
+                throw new Error(errData.message || 'Lỗi khi khởi tạo thanh toán');
+            }
+
+            const paymentData = await resPayment.json();
+            const paymentUrl = paymentData.data?.paymentUrl;
+            console.log(paymentUrl);
+            if (paymentUrl) {
+                window.open(paymentUrl, '_blank');
+                navigate(paymentUrl);
+            } else {
+                throw new Error('Không nhận được link thanh toán từ VNPay');
+            }
+        }
+        catch (err) {
+            console.error('Lỗi khi xử lý thanh toán:', err.message);
             setError(err.message);
         }
     };
 
+
     return (
         <>
-            <Header userName={localStorage.getItem("userName")} categoryDaos={[]}/>
+            <Header userName={localStorage.getItem("userName")} categoryDaos={JSON.parse(localStorage.getItem("categoryDaos") || "[]")}/>
             <main>
-                <div className="hero-cap text-center">
-                    <h2 style={{margin: '40px auto'}}>
-                        {localStorage.getItem('userName')
-                            ? `WELCOME BACK ${localStorage.getItem('userName')}`
-                            : 'WELCOME TO OUR SHOP'}
-                    </h2>
-                </div>
+                {/*<div className="hero-cap text-center">*/}
+                {/*    <h2 style={{margin: '40px auto'}}>*/}
+                {/*        {localStorage.getItem('userName')*/}
+                {/*            ? `WELCOME BACK ${localStorage.getItem('userName')}`*/}
+                {/*            : 'WELCOME TO OUR SHOP'}*/}
+                {/*    </h2>*/}
+                {/*</div>*/}
 
-                <section className="cart_area" style={{margin: '90px auto'}}>
-                    <div className="container">
+                <section className="cart_area" style={{margin: '90px 0'}}>
+                    <div className="container-fluid">
                         {error && <div className="alert alert-danger">{error}</div>}
-                        <div className="billing_details">
+                        {/*<div className="billing_details">*/}
                             <div className="row">
                                 <div className="col-lg-12">
                                     <form className="row contact_form" onSubmit={handleSubmit}>
                                         <div className="col-lg-6">
                                             <h3>Billing Details</h3>
-                                            <div className="col-md-12 form-group mb-3">
+                                            <div className="col-md-12 form-group mb-3 text-left">
                                                 <label htmlFor="fullName">Full name:</label>
                                                 <input
                                                     type="text"
@@ -103,7 +152,7 @@ const Checkout = () => {
                                                     required
                                                 />
                                             </div>
-                                            <div className="col-md-12 form-group mb-3">
+                                            <div className="col-md-12 form-group mb-3 text-left">
                                                 <label htmlFor="phone">Phone number:</label>
                                                 <input
                                                     type="text"
@@ -116,7 +165,7 @@ const Checkout = () => {
                                                     required
                                                 />
                                             </div>
-                                            <div className="col-md-12 form-group mb-3">
+                                            <div className="col-md-12 form-group mb-3 text-left">
                                                 <label htmlFor="email">Email address:</label>
                                                 <input
                                                     type="email"
@@ -129,7 +178,7 @@ const Checkout = () => {
                                                     required
                                                 />
                                             </div>
-                                            <div className="col-md-12 form-group mb-3">
+                                            <div className="col-md-12 form-group mb-3 text-left">
                                                 <label htmlFor="address">Address:</label>
                                                 <input
                                                     type="text"
@@ -142,7 +191,7 @@ const Checkout = () => {
                                                     required
                                                 />
                                             </div>
-                                            <div className="col-md-12 form-group mb-3">
+                                            <div className="col-md-12 form-group mb-3 py-2 py-md-3 text-left">
                                                 <div className="creat_account">
                                                     <h3>Shipping Details</h3>
                                                 </div>
@@ -150,7 +199,7 @@ const Checkout = () => {
                                                     className="form-control"
                                                     id="orderNotes"
                                                     name="orderNotes"
-                                                    rows="1"
+                                                    rows="2"
                                                     placeholder="Order Notes"
                                                     value={formData.orderNotes}
                                                     onChange={handleInputChange}
@@ -158,7 +207,7 @@ const Checkout = () => {
                                             </div>
                                         </div>
                                         <div className="col-lg-6">
-                                            <div className="order_box">
+                                            <div className="order_box" style={{fontSize: '12px'}}>
                                                 <h2>Your Order</h2>
                                                 <ul className="list-group list-group-flush">
                                                     <li className="list-group-item d-flex justify-content-between">
@@ -195,7 +244,7 @@ const Checkout = () => {
                                                     </li>
                                                 </ul>
                                                 <button type="submit" className="btn btn-primary mt-3">
-                                                    Order
+                                                    Payment and Order
                                                 </button>
                                             </div>
                                         </div>
@@ -203,7 +252,7 @@ const Checkout = () => {
                                 </div>
 
                             </div>
-                        </div>
+                        {/*</div>*/}
                     </div>
                 </section>
 
@@ -214,7 +263,7 @@ const Checkout = () => {
                 </div>
             </main>
             <Footer/>
-            <SearchBox/>
+            {/*<SearchBox/>*/}
         </>
 
     );

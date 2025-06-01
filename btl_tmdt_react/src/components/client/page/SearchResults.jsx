@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Header from './Header.jsx';
-import { Footer } from './Footer.jsx';
-import { SearchBox } from './SearchBox.jsx';
+import Header from '../fragment/Header.jsx';
+import { Footer } from '../fragment/Footer.jsx';
+import { SearchBox } from '../fragment/SearchBox.jsx';
 
 const SearchResults = () => {
     const [searchParams] = useSearchParams();
     const query = searchParams.get('query') || '';
     const [products, setProducts] = useState([]);
     const [error, setError] = useState('');
+    const [userName] = useState(localStorage.getItem('userName'));
+    const [categoryDaos, setCategoryDaos] = useState([]);
 
     useEffect(() => {
         const fetchSearchResults = async () => {
@@ -18,9 +20,11 @@ const SearchResults = () => {
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
                 });
-                if (!res.ok) throw new Error('Lỗi khi tìm kiếm sản phẩm');
+                if (!res.ok) throw new Error('Lỗi khi tìm kiếm sản phẩm!!');
                 const data = await res.json();
-                setProducts(data || []);
+                // data.productDaos = undefined;
+                setProducts(data.productDaos || []);
+                console.log(data.productDaos);
             } catch (err) {
                 setError(err.message);
             }
@@ -30,18 +34,18 @@ const SearchResults = () => {
 
     return (
         <>
-            <Header />
+            <Header userName={userName} categoryDaos={categoryDaos}/>
             <main>
                 <section className="popular-items">
                     <div className="hero-cap text-center">
                         <h2 style={{ margin: '40px auto' }}>
-                            Kết quả tìm kiếm cho "{query}"
+                            Search result for "{query}"
                         </h2>
                     </div>
                     <div className="container">
                         {error && <div className="alert alert-danger">{error}</div>}
                         {products.length === 0 && !error && (
-                            <p className="text-center">Không tìm thấy sản phẩm nào.</p>
+                            <p className="text-center">Can't find anything with your keyword</p>
                         )}
                         <div className="row">
                             {products.map((product) => (
@@ -73,7 +77,7 @@ const SearchResults = () => {
                 </section>
             </main>
             <Footer />
-            <SearchBox />
+            {/*<SearchBox />*/}
         </>
     );
 };

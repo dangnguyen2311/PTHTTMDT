@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ProductInOrderService {
@@ -21,12 +22,12 @@ public class ProductInOrderService {
     OrderRepo orderRepo;
 
     public List<ProductInOrder> getProductInOrder(Order order) {
-        return  productInOrderRepo.getProductInOrdersByOrder(order);
-//        return productInOrderRepo.findAllByOrder(order);
+//        return  productInOrderRepo.getProductInOrdersByOrder(order.getOrderId());
+        return productInOrderRepo.findAllByOrder(order.getOrderId());
     }
 
     public void deleteOrder(Order order) {
-        productInOrderRepo.getProductInOrdersByOrder(order);//??????
+        productInOrderRepo.deleteProductInOrderByOrder(order);
         orderRepo.delete(order);
     }
 
@@ -35,13 +36,20 @@ public class ProductInOrderService {
         productInOrder.setOrder(order);
         productInOrderRepo.save(productInOrder);
     }
-
-    public List<ProductInOrder> getByOrder(Order order) {
-        return productInOrderRepo.findAllByOrder(order);
-
-    }
+//
+//    public List<ProductInOrder> getByOrder(Order order) {
+//        return productInOrderRepo.findAllByOrder(order);
+//    }
 
     public void deleteProductInOrderByUser(List<Order> orderToDeleteList) {
         orderToDeleteList.forEach(order -> productInOrderRepo.deleteProductInOrderByOrder(order));
+    }
+
+    public List<ProductInOrder> getProductInOrderByOrderId(String orderId) {
+        Order order = orderRepo.findByOrderId(orderId);
+        if (order != null) {
+            return productInOrderRepo.getProductInOrdersByOrder(order);
+        }
+        return List.of();
     }
 }

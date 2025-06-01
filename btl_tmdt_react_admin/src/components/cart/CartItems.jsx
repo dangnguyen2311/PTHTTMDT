@@ -70,7 +70,7 @@ const CartItems = () => {
                                 <div className="col-sm-6">
                                     <ol className="breadcrumb float-sm-right">
                                         <li className="breadcrumb-item">
-                                            <Link to="/admin">Home</Link>
+                                            <Link to="/">Home</Link>
                                         </li>
                                         <li className="breadcrumb-item active">Items of cart</li>
                                     </ol>

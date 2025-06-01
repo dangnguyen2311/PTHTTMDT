@@ -18,18 +18,16 @@ public class Order {
 
     @Id
     private String orderId;
-
-    private User user; // 🌟 Nhúng trực tiếp đối tượng User
-
+    private User user;
     private String address;
     private String phone;
     private String fullName;
     private Double total;
-
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date orderTime;
+    private String status;
 
     public OrderDao toDao() {
-        return new OrderDao(orderId, user != null ? user.toDao() : null, address, phone, fullName, total, orderTime);
+        return new OrderDao(orderId, user != null ? user.toDao() : null, address, phone, fullName, total, orderTime, status);
     }
 }

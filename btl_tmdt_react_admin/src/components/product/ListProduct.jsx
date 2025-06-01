@@ -16,9 +16,9 @@ const ProductList = () => {
         try {
             let response;
             if (productName.trim() === "") {
-                response = await axios.get("/product");
+                response = await axios.get("/api/admin/product");
             } else {
-                response = await axios.get(`/product/search?name=${productName}`);
+                response = await axios.get(`/api/admin/product/search?name=${productName}`);
             }
             setProducts(response.data);
         } catch (error) {
@@ -34,7 +34,7 @@ const ProductList = () => {
     const handleDelete = async (id) => {
         if (window.confirm("Bạn có chắc muốn xóa sản phẩm này không?")) {
             try {
-                await axios.delete(`/product/${id}`);
+                await axios.delete(`/api/admin/product/${id}`);
                 fetchProducts();
             } catch (err) {
                 console.error("Delete error:", err);
@@ -56,7 +56,7 @@ const ProductList = () => {
                             </div>
                             <div className="col-sm-6">
                                 <ol className="breadcrumb float-sm-right">
-                                    <li className="breadcrumb-item"><a href="/admin">Home</a></li>
+                                    <li className="breadcrumb-item"><Link to="/">Home</Link></li>
                                     <li className="breadcrumb-item active">Products</li>
                                 </ol>
                             </div>
@@ -111,7 +111,7 @@ const ProductList = () => {
                                                 <td>{product.prodPrice.toLocaleString("vi-VN")} VNĐ</td>
                                                 <td>{product.prodDescription}</td>
                                                 <td>
-                                                    <img src={product.prodImg} alt="product" style={{ height: 120, width: 120 }} />
+                                                    <img src={product.prodImg} alt="product" style={{ height: 130, width: 130 }} />
                                                 </td>
                                                 <td>
                                                     <Link to={`/product/edit-product/${product.prodId}`} className="btn btn-info">
@@ -124,18 +124,6 @@ const ProductList = () => {
                                         ))}
                                         </tbody>
                                     </table>
-
-                                    <div className="card-footer clearfix">
-                                        <ul className="pagination pagination-sm m-0 float-right">
-                                            {pageNumbers.map((page) => (
-                                                <li key={page} className="page-item">
-                                                    <button className="page-link" onClick={() => setCurrentPage(page)}>
-                                                        {page}
-                                                    </button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
                                 </div>
 
                             </div>

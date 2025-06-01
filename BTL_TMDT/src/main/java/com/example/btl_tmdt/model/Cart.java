@@ -16,7 +16,7 @@ public class Cart {
     @Id
     private String id;
 
-    private User user; // 🌟 Nhúng trực tiếp thực thể User
+    private User user;
 
     public Cart(User user) {
         this.user = user;

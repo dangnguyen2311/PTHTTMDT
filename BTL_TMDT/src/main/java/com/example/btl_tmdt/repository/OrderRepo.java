@@ -13,6 +13,5 @@ import java.util.List;
 public interface OrderRepo extends MongoRepository<Order, String> {
     Order findByOrderId(String order_id);
 
-
     List<Order> findByUser(User user);
 }

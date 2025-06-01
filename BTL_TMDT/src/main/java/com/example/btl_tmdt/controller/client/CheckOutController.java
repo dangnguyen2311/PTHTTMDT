@@ -85,6 +85,7 @@ public class CheckOutController {
 
         orderDao.setUserDao(user.toDao());
         orderDao.setOrder_time(new Date());
+        orderDao.setStatus("paid");
         orderDao.setTotal(totalPrice + 50000.0);
 
         Order order = orderService.createOrder(orderDao.toModel());
@@ -95,7 +96,7 @@ public class CheckOutController {
             productInCartService.deleteProductInCart(i);
         }
 
-        List<ProductInOrderDao> productInOrderDaos = productInOrderService.getByOrder(order)
+        List<ProductInOrderDao> productInOrderDaos = productInOrderService.getProductInOrderByOrderId(order.getOrderId())
                 .stream().map(ProductInOrder::toDao).collect(Collectors.toList());
 
         return ResponseEntity.ok(Map.of(
@@ -124,18 +125,18 @@ public class CheckOutController {
         ));
     }
 
-    @GetMapping("/my-order/detail/{id}")
-    public ResponseEntity<?> orderDetail(HttpSession session, @PathVariable("id") String id) {
+    @GetMapping("/my-order/detail/{orderId}")
+    public ResponseEntity<?> orderDetail(HttpSession session, @PathVariable("orderId") String orderId) {
         User user = userService.getUserByUserName((String) session.getAttribute("userName"));
         if (user == null)
             return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
 
-        Order order = orderService.getOrderById(id);
+        Order order = orderService.getOrderById(orderId);
 
         List<CategoryDao> categoryDaos = categoryService.getCategories()
                 .stream().map(Category::toDao).collect(Collectors.toList());
 
-        List<ProductInOrderDao> productInOrderDaos = productInOrderService.getByOrder(order)
+        List<ProductInOrderDao> productInOrderDaos = productInOrderService.getProductInOrderByOrderId(order.getOrderId())
                 .stream().map(ProductInOrder::toDao).collect(Collectors.toList());
 
         return ResponseEntity.ok(Map.of(

@@ -12,6 +12,9 @@ function Dashboard() {
         numberOfCart: 0,
         numberOfUser: 0,
         numberOfOrder: 0,
+        numberOfReview: 0,
+        numberOfReturnOrder: 0,
+        numberOfCategory: 0
     });
 
     useEffect(() => {
@@ -26,7 +29,7 @@ function Dashboard() {
         //     height: '100vh',
         //     overflow: 'hidden' // nếu không muốn scroll
         // }}>
-        <div className="wrapper " >
+        <div className="wrapper" >
             <Navbar/>
             <Sidebar/>
             <div className="content-wrapper">
@@ -48,14 +51,20 @@ function Dashboard() {
 
                 <section className="content">
                     <div className="row">
-                        <DashboardCard count={stats.numberOfProduct} title="Products" icon="ion-bag" bgColor="bg-info"
-                                       link="/product"/>
+                        <DashboardCard count={stats.numberOfProduct} title="Products" icon="ion-bag"
+                                       bgColor="bg-info" link="/product"/>
                         <DashboardCard count={stats.numberOfCart} title="Carts" icon="ion-stats-bars"
                                        bgColor="bg-success" link="/cart"/>
                         <DashboardCard count={stats.numberOfUser} title="Users" icon="ion-person-add"
                                        bgColor="bg-warning" link="/user"/>
                         <DashboardCard count={stats.numberOfOrder} title="Orders" icon="ion-pie-graph"
                                        bgColor="bg-danger" link="/order"/>
+                        <DashboardCard count={stats.numberOfReview} title="Reviews" icon="ion-star"
+                                       bgColor="bg-info" link="/review"/>
+                        <DashboardCard count={stats.numberOfReturnOrder} title="Return Orders" icon="ion-reply"
+                                        bgColor="bg-success" link="/return"/>
+                        <DashboardCard count={stats.numberOfCategory} title={"Categories"} icon="ion-grid"
+                                        bgColor="bg-warning" link="/category"/>
                     </div>
                 </section>
             </div>

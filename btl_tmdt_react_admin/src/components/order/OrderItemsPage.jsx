@@ -2,23 +2,25 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navbar from "../fragment/Navbar.jsx";
 import Sidebar from "../fragment/Sidebar.jsx";
-import {Link} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 
-const OrderItemsPage = ({ orderId }) => {
+const OrderItemsPage = () => {
+    const { id } = useParams();
     const [productInOrderDaos, setProductInOrderDaos] = useState([]);
     const [userName, setUserName] = useState('');
 
     useEffect(() => {
         // Gọi API để lấy thông tin sản phẩm trong đơn hàng
-        axios.get(`/admin/order/${orderId}`)
+        axios.get(`/api/admin/order/order-item/${id}`)
             .then(res => {
+                console.log(res.data.items);
                 setProductInOrderDaos(res.data.items); // danh sách sản phẩm
                 setUserName(res.data.userName); // tên người đặt hàng
             })
             .catch(err => {
-                console.error("Error fetching order details:", err);
+                console.log("kmojunihybgtvfrdhextfygkuhlijouhybkgvtfcghj Error fetching order details:" + err);
             });
-    }, [orderId]);
+    }, [id]);
 
     return (
         <div className="wrapper">
@@ -73,11 +75,11 @@ const OrderItemsPage = ({ orderId }) => {
                                                 <td>
                                                     <img
                                                         src={item.productDao.prodImg}
-                                                        alt="product"
+                                                        alt={item.productDao.prodImg}
                                                         style={{ width: "140px", height: "140px" }}
                                                     />
                                                 </td>
-                                                <td>{item.productDao.categoryDao.category_name}</td>
+                                                <td>{item.productDao.categoryDao.categoryName}</td>
                                                 <td>{item.quantity}</td>
                                                 <td>
                                                     {(

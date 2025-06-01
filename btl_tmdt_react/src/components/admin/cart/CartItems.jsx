@@ -25,7 +25,7 @@ const CartItems = () => {
         };
 
         fetchCartItems();
-    }, [id]); // Fetch lại khi id thay đổi
+    }, [id]);
 
     const handleDelete = async (productInCartId) => {
         try {

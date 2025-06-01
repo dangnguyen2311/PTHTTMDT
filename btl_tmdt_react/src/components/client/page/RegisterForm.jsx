@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {useNavigate} from "react-router-dom";
-import Header from "./Header.jsx";
-import {Footer} from "./Footer.jsx"; // Added for navigation
+import Header from "../fragment/Header.jsx";
+import {Footer} from "../fragment/Footer.jsx"; // Added for navigation
 
 function RegisterForm() {
     const [formData, setFormData] = useState({
@@ -69,7 +69,7 @@ function RegisterForm() {
 
     return (
         <main>
-            <Header userName="" categoryDaos={[]} />
+            <Header userName="" categoryDaos={JSON.parse(localStorage.getItem("categoryDaos") || "[]")} />
             <section className="login_part" style={{ margin: "20px auto" }}>
                 <div className="container">
                     <div className="col-lg-6 col-md-6" style={{ margin: "auto" }}>

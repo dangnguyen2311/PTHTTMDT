@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import Navbar from "../fragment/Navbar.jsx";
 import Sidebar from "../fragment/Sidebar.jsx";
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
     const [error, setError] = useState("");
+    const navigate = useNavigate();
 
     useEffect(() => {
         axios.get("/api/admin/user")
@@ -21,6 +22,19 @@ const UserList = () => {
                 }
             });
     }, []);
+
+    const handleDelete = async (id) => {
+        if (window.confirm("Bạn có chắc muốn xóa người dùng này không?")) {
+            try {
+                await axios.delete(`/api/admin/user/${id}`);
+                setUsers(users.filter(user => user.userId !== id));
+                navigate("/user");
+            } catch (error) {
+                console.error("Error deleting user:", error);
+                setError("Đã xảy ra lỗi khi xóa người dùng");
+            }
+        }
+    }
 
     return (
         <div className="wrapper">
@@ -72,7 +86,15 @@ const UserList = () => {
                                                 <td>{user.userRole === "2" ? "Admin" : "Client"}</td>
                                                 <td>
                                                     <Link to={`/user/edit-user/${user.userId}`} className="btn btn-success mr-2">Edit</Link>
-                                                    <Link to={`/user/delete-user/${user.userId}`} className="btn btn-danger">Delete</Link>
+                                                    {/*<Link*/}
+                                                    {/*    to={`/user/delete-user/${user.userId}`}*/}
+                                                    {/*    className="btn btn-danger"*/}
+                                                    {/*    onClick={()=> handleDelete(user.userId)}*/}
+                                                    {/*>*/}
+                                                    {/*    Delete*/}
+                                                    {/*</Link>*/}
+                                                    {/*<button className="btn btn-success mr-2">Edit</button>*/}
+                                                    <button className="btn btn-danger" onClick={() => handleDelete(user.userId)}>Delete</button>
                                                 </td>
                                             </tr>
                                         ))}

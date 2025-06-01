@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from './Header.jsx';
-import { Footer } from './Footer.jsx';
+import Header from '../fragment/Header.jsx';
+import { Footer } from '../fragment/Footer.jsx';
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
@@ -99,7 +99,7 @@ const Cart = () => {
                     <div className="container">
                         {error && <div className="alert alert-danger">{error}</div>}
                         {cartItems.length === 0 && !error && (
-                            <p className="text-center">Giỏ hàng của bạn đang trống.</p>
+                            <p className="text-center">Your cart is empty</p>
                         )}
                         {cartItems.length > 0 && (
                             <div className="cart_inner">
@@ -163,7 +163,7 @@ const Cart = () => {
                                         </tbody>
                                     </table>
                                     <div className="checkout_btn_inner float-right">
-                                        <button className="btn_3 checkout_btn_1" onClick={() => navigate('/checkout')}>
+                                        <button className="btn_3 checkout_btn_1 mx-3" onClick={() => navigate('/checkout')}>
                                             Checkout
                                         </button>
                                         <button className="btn_3" onClick={() => navigate('/slide/1')}>
