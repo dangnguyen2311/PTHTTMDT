@@ -1,11 +1,15 @@
 package com.example.btl_tmdt.service;
 
+import com.example.btl_tmdt.dao.OrderDao;
 import com.example.btl_tmdt.dao.ReturnOrderDao;
 import com.example.btl_tmdt.model.ReturnOrder;
 import com.example.btl_tmdt.repository.ReturnOrderRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,5 +44,23 @@ public class ReturnOrderService {
 
     public ReturnOrderDao getReturnOrderById(String id) {
         return returnOrderRepo.getReturnOrderById(id).toDao();
+    }
+
+    public List<ReturnOrderDao> getReturnOrdersByDateRange(LocalDate startDate, LocalDate endDate) {
+        return returnOrderRepo.findAll().stream()
+                .filter(returnOrder -> {
+                    try {
+                        // Chuyển đổi String -> LocalDate
+                        LocalDate returnDate = Instant.parse(returnOrder.getReturnDate())
+                                .atZone(ZoneId.of("UTC")) // hoặc systemDefault()
+                                .toLocalDate();
+                        return !returnDate.isBefore(startDate) && !returnDate.isAfter(endDate);
+                    } catch (Exception e) {
+                        // Nếu lỗi parse, loại bỏ bản ghi này
+                        return false;
+                    }
+                })
+                .map(ReturnOrder::toDao)
+                .toList();
     }
 }

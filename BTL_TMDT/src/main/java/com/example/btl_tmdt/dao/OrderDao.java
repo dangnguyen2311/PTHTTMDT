@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 
@@ -22,10 +23,10 @@ public class OrderDao {
     private Double total;
 
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private Date order_time;
+    private LocalDate orderTime;
     private String status;
 
     public Order toModel() {
-        return new Order(orderId, userDao != null ? userDao.toModel() : null, address, phone, fullName, total, order_time, status);
+        return new Order(orderId, userDao != null ? userDao.toModel() : null, address, phone, fullName, total, orderTime, status);
     }
 }

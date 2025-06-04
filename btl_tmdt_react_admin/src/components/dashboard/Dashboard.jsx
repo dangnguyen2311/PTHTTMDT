@@ -1,10 +1,14 @@
 // src/pages/AdminDashboard.jsx
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from '/src/components/fragment/Navbar.jsx';
 import Sidebar from '/src/components/fragment/Sidebar';
 import DashboardCard from '/src/components/dashboard/DashboardCard';
 import axios from 'axios';
 import {Link} from "react-router-dom";
+import {toast} from 'react-toastify'
+import {RevenueStat} from "./RevenueStat.jsx";
+import {ReturnStat} from "./ReturnStat.jsx";
+import {BestSellingStat} from "./BestSellingStat.jsx";
 
 function Dashboard() {
     const [stats, setStats] = useState({
@@ -17,11 +21,14 @@ function Dashboard() {
         numberOfCategory: 0
     });
 
+
     useEffect(() => {
-        axios.get('/api/admin/dashboard') // Đổi endpoint này cho đúng backend của bạn
+        axios.get('/api/admin/dashboard')
             .then(res => setStats(res.data))
             .catch(err => console.error('Failed to load stats:', err));
     }, []);
+
+
 
     return (
         // <div className="wrapper" style={{
@@ -62,10 +69,14 @@ function Dashboard() {
                         <DashboardCard count={stats.numberOfReview} title="Reviews" icon="ion-star"
                                        bgColor="bg-info" link="/review"/>
                         <DashboardCard count={stats.numberOfReturnOrder} title="Return Orders" icon="ion-reply"
-                                        bgColor="bg-success" link="/return"/>
+                                       bgColor="bg-success" link="/return"/>
                         <DashboardCard count={stats.numberOfCategory} title={"Categories"} icon="ion-grid"
-                                        bgColor="bg-warning" link="/category"/>
+                                       bgColor="bg-warning" link="/category"/>
                     </div>
+                    <RevenueStat/>
+                    <ReturnStat/>
+                    <BestSellingStat/>
+
                 </section>
             </div>
             <aside className="control-sidebar control-sidebar-dark">

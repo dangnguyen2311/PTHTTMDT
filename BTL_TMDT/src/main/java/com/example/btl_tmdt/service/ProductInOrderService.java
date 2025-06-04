@@ -46,10 +46,6 @@ public class ProductInOrderService {
     }
 
     public List<ProductInOrder> getProductInOrderByOrderId(String orderId) {
-        Order order = orderRepo.findByOrderId(orderId);
-        if (order != null) {
-            return productInOrderRepo.getProductInOrdersByOrder(order);
-        }
-        return List.of();
+        return productInOrderRepo.getProductInOrdersByOrder_OrderId(orderId);
     }
 }

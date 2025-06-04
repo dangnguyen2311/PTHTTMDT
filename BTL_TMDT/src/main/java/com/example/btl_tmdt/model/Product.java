@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -22,7 +23,7 @@ public class Product {
     private String prodNsx;
     private Category category; // chỉ lưu ID của Category
     private String prodImg;
-    private List<String> prodDetailImageList;
+    private ArrayList<String> prodDetailImageList;
 
 
     public ProductDao toDao() {

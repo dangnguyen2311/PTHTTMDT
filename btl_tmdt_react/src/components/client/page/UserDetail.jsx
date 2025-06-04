@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "../fragment/Header.jsx";
 import {Footer} from "../fragment/Footer.jsx";
+import {Link} from "react-router-dom";
 
 const UserDetail = () => {
+    const [favourites, setFavourites] = useState([]);
+
     const [user, setUser] = useState({
         userFullName: "",
         userName: "",
@@ -19,11 +22,12 @@ const UserDetail = () => {
 
     useEffect(() => {
         fetchUserDetail();
+        fetchFavourites();
     }, []);
 
     const fetchUserDetail = async () => {
         try {
-            const response = await axios.get("/api/v1/users/profile"); // sửa lại đúng endpoint backend của bạn
+            const response = await axios.get("/api/v1/users/profile");
             setUser(response.data.userDao);
             setCurrUser({
                 userFullName: response.data.userDao.userFullName,
@@ -32,6 +36,16 @@ const UserDetail = () => {
             });
         } catch (error) {
             console.error("Error fetching user:", error);
+        }
+    };
+    const fetchFavourites = async () => {
+        try {
+            const response = await axios.get("/api/v1/favourite-products/list", {
+                withCredentials: true,
+            });
+            setFavourites(response.data.favouriteProducts || []);
+        } catch (error) {
+            console.error("Error fetching favourites:", error);
         }
     };
 
@@ -85,6 +99,9 @@ const UserDetail = () => {
                                                 <h4>{currUser.userFullName}</h4>
                                                 <p className="text-secondary mb-1">Username: {currUser.userName}</p>
                                                 <p className="text-muted font-size-sm">Address: {currUser.userAddress}</p>
+                                                <Link to={"/logout"}>
+                                                    <button className="btn btn-outline-primary">Logout</button>
+                                                </Link>
                                             </div>
                                         </div>
                                     </div>
@@ -176,7 +193,40 @@ const UserDetail = () => {
                                                     </div>
                                                 </div>
                                             </form>
+
                                         </div>
+                                    </div>
+                                </div>
+                                <div className={"row-12"}>
+                                    <hr/>
+                                    <h2>Favourite Products</h2>
+                                    <div className="row pt-3">
+                                        {favourites.length === 0 ? (
+                                            <div className="col-sm-12 text-muted">No favourite products
+                                                yet.</div>
+                                        ) : (
+                                            favourites.map((fav) => (
+                                                <div className="col-md-6 mb-3" key={fav.id}>
+                                                    <div className="card h-100 p-2 p-md-3">
+                                                        <div className="card-body d-flex align-items-center">
+                                                            <img
+                                                                src={fav.productDao?.prodImg || "https://via.placeholder.com/60"}
+                                                                alt="product"
+                                                                width="150"
+                                                                height="auto"
+                                                                className="me-3 rounded"
+                                                            />
+                                                            <div>
+                                                                <h6 className="mb-1">{fav.productDao?.prodName}</h6>
+                                                                <p className="text-muted mb-0">
+                                                                    Price: {fav.productDao?.prodPrice} $
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
                                     </div>
                                 </div>
                             </div>

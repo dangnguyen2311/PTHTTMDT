@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import Header from '../fragment/Header.jsx';
 import { Footer } from '../fragment/Footer.jsx';
 import { SearchBox } from '../fragment/SearchBox.jsx';
+import {FavouriteProduct} from "../fragment/FavouriteProduct.jsx";
 
 const SearchResults = () => {
     const [searchParams] = useSearchParams();
@@ -11,6 +12,7 @@ const SearchResults = () => {
     const [error, setError] = useState('');
     const [userName] = useState(localStorage.getItem('userName'));
     const [categoryDaos, setCategoryDaos] = useState([]);
+
 
     useEffect(() => {
         const fetchSearchResults = async () => {
@@ -60,6 +62,7 @@ const SearchResults = () => {
                                             <div className="img-cap">
                                                 <span>Add to cart</span>
                                             </div>
+                                            <FavouriteProduct product={product}/>
                                         </div>
                                         <div className="popular-caption">
                                             <h3>

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -78,13 +79,14 @@ public class CheckOutController {
 
         Cart cart = cartService.getCartByUser(user);
         List<ProductInCart> productInCarts = productInCartService.getProductInCart(cart);
+        System.out.println("So luong mat hang duowcc dat: "+productInCarts.size());
 
         Double totalPrice = Double.valueOf(productInCarts.stream()
                 .map(e -> e.getQuantity() * e.getProduct().getProdPrice())
                 .reduce(0.0F, Float::sum));
 
         orderDao.setUserDao(user.toDao());
-        orderDao.setOrder_time(new Date());
+        orderDao.setOrderTime(LocalDate.now());
         orderDao.setStatus("paid");
         orderDao.setTotal(totalPrice + 50000.0);
 
@@ -116,7 +118,7 @@ public class CheckOutController {
 
         List<OrderDao> orderDaos = orderService.getListOrderOfUser(user)
                 .stream().map(Order::toDao)
-                .sorted(Comparator.comparing(OrderDao::getOrder_time).reversed())
+                .sorted(Comparator.comparing(OrderDao::getOrderTime).reversed())
                 .toList();
 
         return ResponseEntity.ok(Map.of(

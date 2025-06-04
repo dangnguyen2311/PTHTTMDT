@@ -63,7 +63,7 @@ public class AdminUserController {
 
         if (existingUsername != null || existingEmail != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Username hoặc Email đã tồn tại trong hệ thống");
+                    .body("Username or Email already exist");
         }
 
         userService.saveUser(userDao.toModel());

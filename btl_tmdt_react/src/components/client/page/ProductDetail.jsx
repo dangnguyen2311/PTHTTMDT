@@ -1,9 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../fragment/Header.jsx";
 import {Footer} from "../fragment/Footer.jsx";
 import {SearchBox} from "../fragment/SearchBox.jsx";
 import ProductReview from "../fragment/ProductReview.jsx";
+import {FavouriteProduct} from "../fragment/FavouriteProduct.jsx";
+import Slider from "react-slick";
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -14,6 +16,8 @@ const ProductDetail = () => {
 
     const [reviews, setReviews] = useState([]);
     const [newReview, setNewReview] = useState("");
+    const [images, setImages] = useState([]);
+
 
     // Dữ liệu mẫu
     useEffect(() => {
@@ -65,6 +69,8 @@ const ProductDetail = () => {
             })
             .then(data => {
                 setProductDao(data.productDao);
+                setImages([data.productDao.prodImg, ...(data.productDao?.prodDetailImageList || [])]);
+
             })
             .catch(err => {
                 console.error(err);
@@ -99,6 +105,16 @@ const ProductDetail = () => {
         });
     };
 
+    const settingSlider = {
+        dots: true,
+        infinite: true,
+        speed: 1000,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        autoplay: true,
+        autoplaySpeed: 1000,
+    };
+
     if (!productDao) return <p>Loading...</p>;
 
     return (
@@ -114,29 +130,47 @@ const ProductDetail = () => {
                 <div className="product_image_area" style={{margin: " auto"}}>
                     <div className="container">
                         <div className="row align-items-center">
-                            <div className="col-lg-12">
-                                <div className="product_img_slide owl-carousel">
-                                    <div className="single_product_img">
-                                        <img src="assets/img/gallery/gallery1.png" alt="#" className="img-fluid"/>
-                                    </div>
-                                    <div className="single_product_img">
-                                        <img src="assets/img/gallery/gallery01.png" alt="#" className="img-fluid"/>
-                                    </div>
-                                    <div className="single_product_img">
-                                        <img src="assets/img/gallery/gallery1.png" alt="#" className="img-fluid"/>
-                                    </div>
-                                </div>
-                            </div>
+
                             <div className="col-md-12">
-                                <div className="single_product_img my-2 my-md-4">
-                                    <img src={productDao.prodImg} alt={productDao.prodName} className="img-fluid"/>
-                                </div>
+                                {/*<div className="single_product_img my-2 my-md-4">*/}
+                                {/*    <img src={productDao.prodImg} alt={productDao.prodName} className="img-fluid"/>*/}
+
+                                {/*</div>*/}
+                                <Slider {...settingSlider}>
+                                    {images.map((img, index) => (
+                                        <div key={index}>
+                                            <div
+                                                style={{
+                                                    display: "flex",
+                                                    justifyContent: "center",
+                                                    alignItems: "center",
+                                                    height: "450px", // khung ảnh
+                                                    width: "auto",
+                                                    background: "#ffffff", // màu nền tùy ý
+                                                    borderRadius: "10px",
+                                                }}
+                                            >
+                                                <img
+                                                    src={img}
+                                                    alt={`Slide ${index + 1}`}
+                                                    style={{
+                                                        maxHeight: "100%",
+                                                        maxWidth: "100%",
+                                                        objectFit: "contain",
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </Slider>
                             </div>
                             <div className="col-12 col-md-12">
-                                <div className="single_product_text text-center my-2 my-md-3">
+                                <div className="single_product_text text-center my-2 my-md-3 py-5">
                                     <h3>{productDao.prodName}</h3>
                                     <p>{productDao.prodDescription}</p>
                                     <div className="card_area my-2 my-md-4">
+                                        <div className={"d-inline-block mb-4"}
+                                             style={{width: "60px"}}><FavouriteProduct product={productDao}/></div>
                                         <div className="product_count_area">
                                             <p>Quantity</p>
                                             <div className="product_count d-inline-block">
@@ -160,7 +194,8 @@ const ProductDetail = () => {
                                         {
                                             userName ? (
                                                 <div className="add_to_cart my-2 my-md-4">
-                                                    <button onClick={handleAddToCart} className="btn_3">Add to Cart</button>
+                                                    <button onClick={handleAddToCart} className="btn_3">Add to Cart
+                                                    </button>
                                                 </div>
                                             ) : (
                                                 <div className="add_to_cart">

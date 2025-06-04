@@ -6,6 +6,7 @@ import { SearchBox } from '../fragment/SearchBox.jsx';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
+import {FavouriteProduct} from "../fragment/FavouriteProduct.jsx";
 
 
 
@@ -42,15 +43,6 @@ const Home = () => {
         autoplaySpeed: 1000,
     };
 
-    const [likedProducts, setLikedProducts] = useState([]);
-
-    const handleToggleLike = (prodId) => {
-        setLikedProducts((prev) =>
-            prev.includes(prodId)
-                ? prev.filter((id) => id !== prodId)
-                : [...prev, prodId]
-        );
-    };
 
     useEffect(() => {
         const fetchSlideData = async () => {
@@ -176,24 +168,7 @@ const Home = () => {
                                             <div className="img-cap" onClick={() => handleAddToCart(product.prodId)}>
                                                 <span>Add to cart</span>
                                             </div>
-                                            {/*</a>*/}
-                                            <div
-                                                className={`favorit-items ${likedProducts.includes(product.prodId) ? 'bg-danger text-white' : 'border'}`}
-                                                onClick={() => handleToggleLike(product.prodId)}
-                                                style={{cursor: 'pointer'}}
-                                            >
-                                                <span
-                                                    className={`flaticon-heart ${likedProducts.includes(product.prodId) ? 'text-white' : ''}`}></span>
-                                            </div>
-
-                                            {/*<div*/}
-                                            {/*    className={`favorit-items ${likedProducts.includes(product.prodId) ? 'text-danger' : ''}`}*/}
-                                            {/*    onClick={() => handleToggleLike(product.prodId)}*/}
-                                            {/*    style={{cursor: 'pointer'}}*/}
-                                            {/*>*/}
-                                            {/*    <span*/}
-                                            {/*        className={`flaticon-heart ${likedProducts.includes(product.prodId) ? 'text-danger' : ''}`}></span>*/}
-                                            {/*</div>*/}
+                                            <FavouriteProduct product={product}/>
 
                                         </div>
                                         <div className="popular-caption">

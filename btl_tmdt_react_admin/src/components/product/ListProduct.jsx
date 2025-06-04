@@ -111,7 +111,7 @@ const ProductList = () => {
                                                 <td>{product.prodPrice.toLocaleString("vi-VN")} VNĐ</td>
                                                 <td>{product.prodDescription}</td>
                                                 <td>
-                                                    <img src={product.prodImg} alt="product" style={{ height: 130, width: 130 }} />
+                                                    <img src={product.prodImg} alt="product" style={{ height: 130, width: "auto" }} />
                                                 </td>
                                                 <td>
                                                     <Link to={`/product/edit-product/${product.prodId}`} className="btn btn-info">

@@ -12,7 +12,7 @@ function Sidebar() {
         { label: 'Return', base: 'return'},
     ];
     return (
-        <aside className="main-sidebar sidebar-light-green elevation-4">
+        <aside className="main-sidebar  sidebar-light-green elevation-4">
             <a href="/" className="brand-link">
                 <span className="brand-text font-weight-normal">Admin</span>
             </a>

@@ -64,9 +64,7 @@ public class AdminOrderController {
 //        }
 
         Order order = orderService.getOrderById(id);
-        if (order == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
-        }
+        System.out.println("Admin see Order: "+order.getOrderId() + " = id = " + id +", status: " + order.getStatus() + ",nums = " + productInOrderService.getProductInOrderByOrderId(id).size());
 
         List<ProductInOrderDao> productInOrderDaos = productInOrderService.getProductInOrder(order)
                 .stream().map(ProductInOrder::toDao).collect(Collectors.toList());
@@ -94,9 +92,5 @@ public class AdminOrderController {
         productInOrderService.deleteOrder(order);
         return ResponseEntity.ok("Order deleted successfully");
     }
-
-//    @PostMapping("/item")
-//    public String getProductInOrderPost(@ModelAttribute)
-
 
 }

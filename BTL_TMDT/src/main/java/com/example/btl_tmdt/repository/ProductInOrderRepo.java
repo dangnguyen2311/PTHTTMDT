@@ -23,4 +23,6 @@ public interface ProductInOrderRepo extends MongoRepository<ProductInOrder, Stri
 
     //    void deleteByOrder(Order order);
     void deleteProductInOrderByOrder(Order order);
+
+    List<ProductInOrder> getProductInOrdersByOrder_OrderId(String orderOrderId);
 }

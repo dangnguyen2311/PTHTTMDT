@@ -87,4 +87,8 @@ public class ProductService {
     public List<Product> getProductsByCategory(Category categoryDaoByName) {
         return prodRepo.getProductsByCategory(categoryDaoByName);
     }
+
+    public void updateProduct(Product existingProduct) {
+        prodRepo.save(existingProduct);
+    }
 }

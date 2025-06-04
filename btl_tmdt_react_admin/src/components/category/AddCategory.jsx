@@ -22,8 +22,8 @@ const AddCategory = () => {
         e.preventDefault();
         try {
             const response = await axios.post('/api/admin/category/add-category', {
-                category_name: categoryName,
-                category_description: categoryDescription,
+                categoryName: categoryName,
+                categoryDescription: categoryDescription,
             });
             // Handle success (e.g., redirect or clear form)
             navigate("/category");

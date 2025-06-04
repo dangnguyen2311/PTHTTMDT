@@ -11,6 +11,9 @@ import com.example.btl_tmdt.model.User;
 import com.example.btl_tmdt.service.CategoryService;
 import com.example.btl_tmdt.service.ProductService;
 import com.example.btl_tmdt.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpSession;
 import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -234,54 +238,102 @@ public class AdminProductController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> addProduct(@ModelAttribute ProductDao productDao,
-                                        @RequestParam("pictureFile") MultipartFile pictureFile) {
-        if (pictureFile.isEmpty()) {
-            return ResponseEntity.badRequest().body("Please upload picture file");
+    public ResponseEntity<?> addProduct(@ModelAttribute ProductDao productDao
+//                                        @RequestParam("pictureFile") MultipartFile pictureFile,
+//                                        @RequestParam(value = "prodDetailImageList", required = false) MultipartFile[] detailImages
+    ) {
+        ProductDao existingProduct = productService.getProductByName(productDao.getProdName());
+        if (existingProduct != null) {
+            return ResponseEntity.badRequest().body("Product Name already exists");
         }
 
-        try {
-            ProductDao existingProduct = productService.getProductByName(productDao.getProdName());
-            if (existingProduct != null) {
-                return ResponseEntity.badRequest().body("Product Name already exists");
-            }
+//            Map uploadResult = cloudinary.uploader().upload(pictureFile.getBytes(),
+//                    ObjectUtils.asMap("resource_type", "image"));
+//            String imageUrl = (String) uploadResult.get("secure_url");
+//            productDao.setProdImg(imageUrl);
 
-            Map uploadResult = cloudinary.uploader().upload(pictureFile.getBytes(),
-                    ObjectUtils.asMap("resource_type", "image"));
-            String imageUrl = (String) uploadResult.get("secure_url");
-            productDao.setProdImg(imageUrl);
+        // Upload ảnh chi tiết nếu có
+//            ArrayList<String> detailImageUrls = new ArrayList<>();
+//            if (detailImages != null) {
+//                for (MultipartFile file : detailImages) {
+//                    if (!file.isEmpty()) {
+//                        Map result = cloudinary.uploader().upload(file.getBytes(),
+//                                ObjectUtils.asMap("resource_type", "image"));
+//                        String url = (String) result.get("secure_url");
+//                        detailImageUrls.add(url);
+//                    }
+//                }
+//            }
+//            productDao.setProdDetailImageList(detailImageUrls);
 
-            productService.createProduct(productDao.toModel());
+        productService.createProduct(productDao.toModel());
 
-            return ResponseEntity.ok("Product created successfully");
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Upload image error: " + e.getMessage());
-        }
+        return ResponseEntity.ok("Product created successfully");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable String id,
-                                           @ModelAttribute ProductDao productDao,
-                                           @RequestParam(value = "pictureFile", required = false) MultipartFile pictureFile) {
-        if (pictureFile != null && !pictureFile.isEmpty()) {
-            try {
-                Map uploadResult = cloudinary.uploader().upload(pictureFile.getBytes(),
-                        ObjectUtils.asMap("resource_type", "image"));
-                String imageUrl = (String) uploadResult.get("secure_url");
-                productDao.setProdImg(imageUrl);
-            } catch (IOException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Upload image error: " + e.getMessage());
-            }
-        } else {
-            Product existing = productService.getProductById(id);
-            productDao.setProdImg(existing.getProdImg());
+    public ResponseEntity<?> updateProduct(
+            @PathVariable String id,
+            @ModelAttribute ProductDao productDao,
+            @RequestPart(value = "prodDetailImageList", required = false) String prodDetailImageListJson
+    ) {
+        // Kiểm tra sản phẩm tồn tại
+        Product existingProduct = productService.getProductById(id);
+        if (existingProduct == null) {
+            return ResponseEntity.badRequest().body("Product not found");
         }
 
-        productService.editProduct(productDao.toModel(), id);
+        // Cập nhật thông tin sản phẩm
+        existingProduct.setProdName(productDao.getProdName());
+        existingProduct.setProdDescription(productDao.getProdDescription());
+        existingProduct.setProdPrice(productDao.getProdPrice());
+        existingProduct.setProdNsx(productDao.getProdNsx());
+        existingProduct.setCategory(productDao.getCategoryDao().toModel());
+        existingProduct.setProdImg(productDao.getProdImg());
+
+        // Xử lý prodDetailImageList từ chuỗi JSON
+        if (prodDetailImageListJson != null && !prodDetailImageListJson.isEmpty()) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                ArrayList<String> detailImageUrls = objectMapper.readValue(
+                        prodDetailImageListJson,
+                        new TypeReference<ArrayList<String>>() {}
+                );
+                existingProduct.setProdDetailImageList(detailImageUrls);
+            } catch (JsonProcessingException e) {
+                return ResponseEntity.badRequest().body("Invalid format for prodDetailImageList");
+            }
+        } else {
+            existingProduct.setProdDetailImageList(new ArrayList<>());
+        }
+
+        productService.updateProduct(existingProduct);
+
         return ResponseEntity.ok("Product updated successfully");
     }
+
+//    @PutMapping("/{id}")
+//    public ResponseEntity<?> updateProduct(@PathVariable String id,
+//                                           @ModelAttribute ProductDao productDao,
+//                                           @RequestParam(value = "pictureFile", required = false) MultipartFile pictureFile) {
+//        if (pictureFile != null && !pictureFile.isEmpty()) {
+//            try {
+//                Map uploadResult = cloudinary.uploader().upload(pictureFile.getBytes(),
+//                        ObjectUtils.asMap("resource_type", "image"));
+//                String imageUrl = (String) uploadResult.get("secure_url");
+//                productDao.setProdImg(imageUrl);
+//            } catch (IOException e) {
+//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                        .body("Upload image error: " + e.getMessage());
+//            }
+//        } else {
+//            Product existing = productService.getProductById(id);
+//            productDao.setProdImg(existing.getProdImg());
+//        }
+//
+//        productService.editProduct(productDao.toModel(), id);
+//        return ResponseEntity.ok("Product updated successfully");
+//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable String id) {

@@ -9,6 +9,8 @@ const Checkout = () => {
     const [cartItems, setCartItems] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
     const [error, setError] = useState('');
+    const [returnUrl, setReturnUrl] = useState(`${window.location.origin}`);
+
     const [formData, setFormData] = useState({
         fullName: '',
         phone: '',
@@ -25,7 +27,7 @@ const Checkout = () => {
             credentials: 'include',
         })
             .then(res => {
-                if (!res.ok) throw new Error('Lỗi khi lấy giỏ hàng');
+                if (!res.ok) throw new Error('Error fetching cart data');
                 return res.json();
             })
             .then(data => {
@@ -36,6 +38,7 @@ const Checkout = () => {
                 } else {
                     setCartItems(data.cartItemDaos || []);
                     setTotalPrice(data.totalPrice || 0);
+                    console.log("Duong dan hien tai + returnUrl:",  returnUrl);
                 }
             })
             .catch(err => {
@@ -44,7 +47,6 @@ const Checkout = () => {
             });
     }, []);
 
-    // Xử lý thay đổi input form
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -55,7 +57,7 @@ const Checkout = () => {
 
         if (!fullName.trim() || !phone.trim() || !email.trim() || !address.trim()) {
             console.log(error);
-            setError("Vui lòng điền đầy đủ thông tin: Họ tên, Số điện thoại, Email và Địa chỉ.");
+            setError("Please fill in all required fields.");
             return false;
         }
 
@@ -76,14 +78,14 @@ const Checkout = () => {
 
             if (!resOrder.ok) {
                 const errorData = await resOrder.json();
-                throw new Error(errorData.error || 'Lỗi khi đặt hàng');
+                throw new Error(errorData.error || 'Error placing order');
             }
 
             const orderData = await resOrder.json();
-            console.log('Đặt hàng thành công:', orderData.message);
+            console.log('Order successfully:', orderData.message);
 
             // Call API VNPay
-            const resPayment = await fetch('/api/v1/payment/vn-pay', {
+            const resPayment = await fetch(`/api/v1/payment/vn-pay/${orderData.orderDao.orderId}`, {
                 method: 'POST',
                 headers:{
                     'Content-Type': 'application/json',
@@ -93,26 +95,28 @@ const Checkout = () => {
                     amount: totalPrice + 50000,
                     bankCode: 'NCB',
                     note: formData.orderNotes,
-                })
+                    returnUrl: returnUrl + '/payment',
+                }),
             });
 
             if (!resPayment.ok) {
                 const errData = await resPayment.json();
-                throw new Error(errData.message || 'Lỗi khi khởi tạo thanh toán');
+                throw new Error(errData.message || 'Error creating payment link');
             }
 
             const paymentData = await resPayment.json();
             const paymentUrl = paymentData.data?.paymentUrl;
             console.log(paymentUrl);
             if (paymentUrl) {
-                window.open(paymentUrl, '_blank');
+                // window.open(paymentUrl, '_blank');
+                window.open(paymentUrl);
                 navigate(paymentUrl);
             } else {
-                throw new Error('Không nhận được link thanh toán từ VNPay');
+                throw new Error('Could not retrieve payment URL');
             }
         }
         catch (err) {
-            console.error('Lỗi khi xử lý thanh toán:', err.message);
+            console.error('Error when checkout:', err.message);
             setError(err.message);
         }
     };

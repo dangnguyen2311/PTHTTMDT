@@ -72,18 +72,35 @@ public class AdminController {
 
     // Endpoint to handle login
     @PostMapping("/login")
-    public ResponseEntity<String> adminLoginPost(@RequestBody User user) {
-        User user1 = userService.getUserByUserName(user.getUserName());
-        User user2 = userService.getUserByEmail(user.getUserEmail());
-
-        if (user1 != null && user2 != null) {
-            if (user1.getUserPass().equals(user.getUserPass()) || user2.getUserPass().equals(user.getUserPass())) {
-                if (user.getUserRole().equals("1"))
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Login failed, user is not admin");
-                return ResponseEntity.ok("Login successfully");
-            }
+    public ResponseEntity<?> adminLoginPost(@RequestBody User user) {
+        User userByUserName = userService.getUserByUserName(user.getUserName());
+        System.out.println("Admin dang nhap: "+user.getUserName());
+        if(userByUserName == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Login failed");
+        if(!userByUserName.getUserRole().equals("2")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed, user is not admin");
+        }
+        else{
+            return ResponseEntity.ok(Map.of(
+                    "message", "Login successfully",
+                    "adminName", userByUserName.getUserName()
+            ));
+        }
+
+
+//        if (user1 != null || user2 != null) {
+//            assert user1 != null;
+//            if (user1.getUserPass().equals(user.getUserPass()) || user2.getUserPass().equals(user.getUserPass())) {
+//                if (user.getUserRole().equals("1"))
+//                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Login failed, user is not admin");
+//                return ResponseEntity.ok(Map.of(
+//                        "message", "Login successfully",
+//                        "adminName", user1.getUserName()
+//                ));
+//            }
+//        }
+//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Login failed");
     }
 
     // Endpoint to handle logout

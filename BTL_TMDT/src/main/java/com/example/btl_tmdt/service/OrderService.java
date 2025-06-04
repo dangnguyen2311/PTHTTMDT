@@ -10,6 +10,7 @@ import com.example.btl_tmdt.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,6 +54,16 @@ public class OrderService {
         Order order = orderRepo.findByOrderId(orderDaotoReturn.getOrderId());
         order.setStatus(orderDaotoReturn.getStatus());
         orderRepo.save(order);
+    }
+
+    public List<OrderDao> getOrdersByDateRange(LocalDate startDate, LocalDate endDate) {
+        return orderRepo.findAll().stream()
+                .filter(order -> {
+                    LocalDate orderDate = order.getOrderTime();
+                    return !orderDate.isBefore(startDate) && !orderDate.isAfter(endDate) && !"returned".equals(order.getStatus());
+                })
+                .map(Order::toDao)
+                .collect(Collectors.toList());
     }
 
 //    public List<ProductDao> getProductsInOder(String order_id){

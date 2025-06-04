@@ -8,7 +8,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.Locale;
 
 @Data
 @Document(collection = "orders")
@@ -24,7 +26,7 @@ public class Order {
     private String fullName;
     private Double total;
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private Date orderTime;
+    private LocalDate orderTime;
     private String status;
 
     public OrderDao toDao() {

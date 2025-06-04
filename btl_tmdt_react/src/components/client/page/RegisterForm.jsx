@@ -28,12 +28,12 @@ function RegisterForm() {
 
         // Basic input validation
         if (!formData.userName || !formData.userEmail || !formData.userPass) {
-            setError("Vui lòng điền đầy đủ các trường bắt buộc");
+            setError("Please fill in all required fields");
             return;
         }
 
         if (formData.userPass !== formData.confirmPassword) {
-            setError("Mật khẩu xác nhận không khớp");
+            setError("Passwords do not match");
             return;
         }
 
@@ -63,7 +63,7 @@ function RegisterForm() {
         }
         catch (error) {
             console.log(error);
-            setError("Lỗi kết nối tới máy chủ" + error);
+            setError("Error when connects to Server" + error);
         }
     };
 
@@ -76,7 +76,7 @@ function RegisterForm() {
                         <div className="login_part_form">
                             <div className="login_part_form_iner">
                                 <h3>
-                                    Chào mừng bạn! <br /> Vui lòng đăng ký để mua sắm
+                                    Welcome to our shop! <br /> Please register to continue
                                 </h3>
 
                                 {error && (
@@ -93,7 +93,7 @@ function RegisterForm() {
                                             name="userName"
                                             value={formData.userName}
                                             onChange={handleChange}
-                                            placeholder="Tên đăng nhập"
+                                            placeholder="Username"
                                             required
                                         />
                                     </div>
@@ -104,7 +104,7 @@ function RegisterForm() {
                                             name="userFullName"
                                             value={formData.userFullName}
                                             onChange={handleChange}
-                                            placeholder="Họ và tên"
+                                            placeholder="Full Name"
                                             required
                                         />
                                     </div>
@@ -126,7 +126,7 @@ function RegisterForm() {
                                             name="userPhone"
                                             value={formData.userPhone}
                                             onChange={handleChange}
-                                            placeholder="Số điện thoại"
+                                            placeholder="Phone Number"
                                             required
                                         />
                                     </div>
@@ -137,7 +137,7 @@ function RegisterForm() {
                                             name="userAddress"
                                             value={formData.userAddress}
                                             onChange={handleChange}
-                                            placeholder="Địa chỉ"
+                                            placeholder="Address"
                                             required
                                         />
                                     </div>
@@ -148,7 +148,7 @@ function RegisterForm() {
                                             name="userPass"
                                             value={formData.userPass}
                                             onChange={handleChange}
-                                            placeholder="Mật khẩu"
+                                            placeholder="Password"
                                             required
                                         />
                                     </div>
@@ -159,13 +159,13 @@ function RegisterForm() {
                                             name="confirmPassword"
                                             value={formData.confirmPassword}
                                             onChange={handleChange}
-                                            placeholder="Xác nhận mật khẩu"
+                                            placeholder="Password Confirmation"
                                             required
                                         />
                                     </div>
                                     <div className="col-md-12 form-group">
                                         <button type="submit" className="btn_3">
-                                            Đăng ký
+                                            Register
                                         </button>
                                     </div>
                                 </form>

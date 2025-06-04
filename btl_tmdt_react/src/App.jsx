@@ -18,6 +18,8 @@ import Category from "./components/client/page/Category.jsx";
 import {SearchBox} from "./components/client/fragment/SearchBox.jsx";
 import SearchResults from "./components/client/page/SearchResults.jsx";
 import UserDetail from "./components/client/page/UserDetail.jsx";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 // import {useState} from "react";
 // import AppWrapper from "./AppWrapper.jsx";
 
@@ -25,19 +27,35 @@ function App() {
     const isLoggedIn = !!localStorage.getItem("userName");
     console.log("User is logged in:", isLoggedIn + ", UserName:", localStorage.getItem("userName"));
 
+    const isAdminAuthenticated = () => {
+        return !!localStorage.getItem("adminName");
+    };
+
+    const PrivateRoute = ({ children }) => {
+        return isAdminAuthenticated() ? children : <Navigate to="/login" />;
+    };
+
+    const RedirectIfLoggedIn = ({ children }) => { // dungf trong Login
+        return isAdminAuthenticated() ? <Navigate to="/dashboard" /> : children;
+    };
 
     return (
-        <Routes>
-            {/*<AppWrapper>/!* Trang gốc: Chuyển hướng dựa trên trạng thái đăng nhập *!/*/}
-                <Route
-                    path="/"
-                    element={isLoggedIn ? <Navigate to="/slide/1" replace /> : <Navigate to="/login" replace />}
-                />
+        <>
+            <Routes>
+                {/*<AppWrapper>/!* Trang gốc: Chuyển hướng dựa trên trạng thái đăng nhập *!/*/}
+                {/*<Route*/}
+                {/*    path="/"*/}
+                {/*    element={isLoggedIn ? <Navigate to="/slide/1" replace /> : <Navigate to="/login" replace />}*/}
+                {/*/>*/}
+                <Route path={"/"} element={<Navigate to={"/slide/1"}/>}/>
                 <Route path="/login" element={<Login />} />
                 <Route path="/slide/:id" element={<Home />} />
                 <Route path="/search" element={<SearchResults />} />
                 <Route path="/register" element={<RegisterForm />} />
-                <Route path="/my-cart" element={<Cart />} />
+                <Route path="/my-cart" element={
+                    isLoggedIn ? <Cart /> :
+                        <Navigate to="/login" replace />
+                } />
                 <Route path="/logout" element={<Logout />} />
 
                 <Route path="/category/:name" element={<Category/>}></Route>
@@ -52,9 +70,12 @@ function App() {
                 <Route path="/admin" element={<Dashboard />} />
                 <Route path="/admin/cart" element={<CartManagement/>} />
                 <Route path="/admin/cart/cart-item/:id" element={<CartItems/>} />
-        {/*</AppWrapper>*/}
+                {/*</AppWrapper>*/}
 
-        </Routes>
+            </Routes>
+            <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop />
+        </>
+
     );
 }
 

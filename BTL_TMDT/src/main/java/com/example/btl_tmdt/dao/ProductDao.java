@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -18,7 +19,7 @@ public class ProductDao {
     private String prodNsx;
     private CategoryDao categoryDao;
     private String prodImg;
-    private List<String> prodDetailImageList;
+    private ArrayList<String> prodDetailImageList;
 
     public Product toModel(){
         return new Product(prodId, prodName, prodDescription, prodPrice, prodNsx, categoryDao.toModel(), prodImg, prodDetailImageList);

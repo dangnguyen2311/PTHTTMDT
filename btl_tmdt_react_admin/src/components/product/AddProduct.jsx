@@ -17,9 +17,9 @@ const AddProduct = () => {
 
     const [categories, setCategories] = useState([]);
     const [pictureFile, setPictureFile] = useState(null);
+    const [detailFiles, setDetailFiles] = useState([]);
 
     useEffect(() => {
-        // Gọi API lấy danh sách category
         axios.get('/api/admin/category') // <-- đổi đường dẫn nếu khác
             .then(res => setCategories(res.data))
             .catch(err => console.error(err));
@@ -46,14 +46,31 @@ const AddProduct = () => {
     const handleFileChange = (e) => {
         setPictureFile(e.target.files[0]);
     };
+    const handleUploadToCloudinary = async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "upload_without_key"); // từ Cloudinary
+        formData.append("cloud_name", "dhwkxxjmz"); // tài khoản Cloudinary
 
-    const handleSubmit = (e) => {
+        try {
+            const response = await fetch("https://api.cloudinary.com/v1_1/dhwkxxjmz/image/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+            return data.secure_url; // link ảnh đã upload
+        } catch (err) {
+            console.error("Upload error:", err);
+            return null;
+        }
+    };
+
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!pictureFile) {
-            alert("Please select an image.");
-            return;
-        }
+        const prodImg = await handleUploadToCloudinary(pictureFile);
 
         const formData = new FormData();
         formData.append('prodName', product.prodName);
@@ -61,7 +78,12 @@ const AddProduct = () => {
         formData.append('prodPrice', product.prodPrice);
         formData.append('prodNsx', product.prodNsx);
         formData.append('categoryDao.id', product.categoryDao.id);
-        formData.append('pictureFile', pictureFile);
+        formData.append('prodImg', prodImg);
+
+        for (let i = 0; i < detailFiles.length; i++) {
+            const url = await handleUploadToCloudinary(detailFiles[i]);
+            formData.append('prodDetailImageList', url);
+        }
 
         axios.post('/api/admin/product', formData)
             .then(() => {
@@ -72,9 +94,10 @@ const AddProduct = () => {
                     prodPrice: '',
                     prodDescription: '',
                     prodNsx: '',
-                    categoryDao: { id: '' }
+                    categoryDao: {id: ''}
                 });
                 setPictureFile(null);
+                setDetailFiles([]);
                 navigate("/product")
             })
             .catch(err => {
@@ -155,6 +178,20 @@ const AddProduct = () => {
                                 <input type="file" name="pictureFile" className="form-control-file"
                                        onChange={handleFileChange} required/>
                             </div>
+
+                            <div className="form-group">
+                                <label>Detail Images</label>
+                                <input
+                                    type="file"
+                                    name="prodDetailImageList"
+                                    className="form-control-file"
+                                    multiple
+                                    onChange={(e) => {
+                                        setDetailFiles(prev => [...prev, ...Array.from(e.target.files)]);
+                                    }}
+                                />
+                            </div>
+
                         </div>
 
                         <div className="card-footer">

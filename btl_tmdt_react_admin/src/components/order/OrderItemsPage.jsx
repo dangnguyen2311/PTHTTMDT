@@ -76,7 +76,7 @@ const OrderItemsPage = () => {
                                                     <img
                                                         src={item.productDao.prodImg}
                                                         alt={item.productDao.prodImg}
-                                                        style={{ width: "140px", height: "140px" }}
+                                                        style={{ width: "140px", height: "auto" }}
                                                     />
                                                 </td>
                                                 <td>{item.productDao.categoryDao.categoryName}</td>

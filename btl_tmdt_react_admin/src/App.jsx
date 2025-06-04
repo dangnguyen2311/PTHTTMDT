@@ -1,6 +1,6 @@
 // App.jsx
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import {Routes, Route, Navigate} from 'react-router-dom';
 import Dashboard from './components/dashboard/Dashboard';
 import CartManagement from "./components/cart/CartManagement.jsx";
 import CartItems from "./components/cart/CartItems.jsx";
@@ -17,13 +17,39 @@ import AddProduct from "./components/product/AddProduct.jsx";
 import EditProduct from "./components/product/EditProduct.jsx";
 import ReviewList from "./components/review/ReviewList.jsx";
 import ReturnOrder from "./components/return/ReturnOrder.jsx";
+import Login from "./components/fragment/Login.jsx";
+import Logout from "./components/fragment/Logout.jsx";
 // import Login from "./components/login/Login.jsx";
+
+const isAdminAuthenticated = () => {
+        return !!localStorage.getItem("adminName");
+};
+
+const PrivateRoute = ({ children }) => {
+        return isAdminAuthenticated() ? children : <Navigate to="/login" />;
+};
+
+const RedirectIfLoggedIn = ({ children }) => {
+        return isAdminAuthenticated() ? <Navigate to="/dashboard" /> : children;
+};
 
 const App = () => {
     return (
         <Routes>
-            {/*<Route path="/login" element={<Login/>}></Route>*/}
-            <Route path="/" element={<Dashboard />} />
+                <Route
+                    path="/login"
+                    element={
+                        <RedirectIfLoggedIn>
+                            <Login />
+                        </RedirectIfLoggedIn>
+                    }
+                />
+            <Route path="/" element={
+                <PrivateRoute>
+                    <Dashboard />
+                </PrivateRoute>
+            } />
+            <Route path={"/logout"} element={<Logout/>}></Route>
 
             <Route path="/category" element={<Categories/>}/>
             <Route path="/category/add-category" element={<AddCategory/>}/>

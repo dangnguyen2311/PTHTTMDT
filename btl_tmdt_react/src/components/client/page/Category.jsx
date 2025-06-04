@@ -3,6 +3,7 @@ import {useParams,  Link} from 'react-router-dom';
 import Header from '../fragment/Header.jsx';
 import { Footer } from '../fragment/Footer.jsx';
 import { SearchBox } from '../fragment/SearchBox.jsx';
+import {FavouriteProduct} from "../fragment/FavouriteProduct.jsx";
 
 const Category = () => {
     const {name } = useParams();
@@ -12,6 +13,24 @@ const Category = () => {
     const [userName] = localStorage.getItem('userName');
     const [categoryDaos, setCategoryDaos] = useState([]);
     const [error, setError] = useState('');
+    const [sortOption, setSortOption] = useState('name-asc');
+
+    const getSortedProducts = () => {
+        const sorted = [...products];
+        switch (sortOption) {
+            case 'name-asc':
+                return sorted.sort((a, b) => a.prodName.localeCompare(b.prodName));
+            case 'name-desc':
+                return sorted.sort((a, b) => b.prodName.localeCompare(a.prodName));
+            case 'price-asc':
+                return sorted.sort((a, b) => a.prodPrice - b.prodPrice);
+            case 'price-desc':
+                return sorted.sort((a, b) => b.prodPrice - a.prodPrice);
+            default:
+                return products;
+        }
+    };
+
 
     useEffect(() => {
         const fetchSlideData = async () => {
@@ -55,12 +74,26 @@ const Category = () => {
                     {error && <div className="alert alert-danger">{error}</div>}
                     <div className="hero-cap text-center">
                         <h2 style={{margin: '40px auto'}}>
-                            {name? `All Products From ${name}` : 'All Products'}
+                            {name ? `All Products From ${name}` : 'All Products'}
                         </h2>
+                        <div className="d-flex justify-content-end mb-3">
+                            <label className="mr-2 mt-1">Sort by:</label>
+                            <select
+                                className="form-control w-auto"
+                                value={sortOption}
+                                onChange={(e) => setSortOption(e.target.value)}
+                            >
+                                <option value="name-asc">Name A → Z</option>
+                                <option value="name-desc">Name Z → A</option>
+                                <option value="price-asc">Price Low → High</option>
+                                <option value="price-desc">Price High → Low</option>
+                            </select>
+                        </div>
+
                     </div>
                     <div className="container">
                         <div className="row">
-                            {products.map((product) => (
+                            {getSortedProducts().map((product) => (
                                 <div key={product.prodId} className="col-xl-4 col-lg-4 col-md-6 col-sm-6">
                                     <div className="single-popular-items mb-50 text-center">
                                         <div className="popular-img">
@@ -73,10 +106,7 @@ const Category = () => {
                                             <div className="img-cap" onClick={() => handleAddToCart(product.prodId)}>
                                                 <span>Add to cart</span>
                                             </div>
-                                            {/*</a>*/}
-                                            <div className="favorit-items">
-                                                <span className="flaticon-heart"></span>
-                                            </div>
+                                            <FavouriteProduct product={product}/>
                                         </div>
                                         <div className="popular-caption">
                                             <h3>
