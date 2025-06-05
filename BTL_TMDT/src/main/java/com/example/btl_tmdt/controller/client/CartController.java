@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import com.example.btl_tmdt.service.InteractionLogService;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,6 +39,9 @@ public class CartController {
 
     @Autowired
     private ProductInCartService productInCartService;
+
+    @Autowired
+    InteractionLogService interactionLogService;
 
     @GetMapping("/my-cart")
     public ResponseEntity<?> getCartDetail(HttpSession session) {
@@ -116,10 +120,10 @@ public class CartController {
 //        return "redirect:/my-cart";
 //    }
 
-    @PostMapping("/add-to-cart") //ĐÃ SỬA
+    @PostMapping("/add-to-cart") // ĐÃ SỬA
     public ResponseEntity<?> addToCart(
             HttpSession session,
-            @RequestParam("id") String id,
+            @RequestParam("id") String id, // Đây là prodId
             @RequestParam("quantity") int quantity) {
 
         String userName = (String) session.getAttribute("userName");
@@ -129,7 +133,7 @@ public class CartController {
         }
 
         Cart cart = cartService.getCartByUser(user);
-        Product product = productService.getProductById(id);
+        Product product = productService.getProductById(id); // id ở đây là prodId
         if (product == null) {
             return ResponseEntity.badRequest().body(Map.of("error", "Sản phẩm không tồn tại"));
         }
@@ -137,7 +141,8 @@ public class CartController {
         List<ProductInCart> productInCartList = productInCartService.getProductInCart(cart);
         boolean exists = false;
         for (ProductInCart item : productInCartList) {
-            if (item.getProduct().equals(product)) {
+            // So sánh bằng prodId thay vì toàn bộ đối tượng Product để đảm bảo chính xác
+            if (item.getProduct().getProdId().equals(product.getProdId())) {
                 productInCartService.updateProductInCart(item.getId(), item.getQuantity() + quantity);
                 exists = true;
                 break;
@@ -148,6 +153,14 @@ public class CartController {
             ProductInCart productInCart = new ProductInCart(cart, product, quantity);
             productInCartService.createProductInCart(productInCart);
         }
+
+        // Ghi log tương tác "ADD_TO_CART" sau khi thêm/cập nhật thành công
+        // userId: user.getUserId()
+        // productId: id (prodId)
+        // interactionType: "ADD_TO_CART"
+        // rating: null (vì đây không phải tương tác đánh giá)
+        interactionLogService.createInteractionLog(user.getUserId(), id, "ADD_TO_CART", null);
+
 
         return ResponseEntity.ok(Map.of("message", "Thêm vào giỏ hàng thành công"));
     }

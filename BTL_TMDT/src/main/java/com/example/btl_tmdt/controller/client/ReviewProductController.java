@@ -2,7 +2,10 @@ package com.example.btl_tmdt.controller.client;
 
 import com.example.btl_tmdt.dao.ReviewProductDao;
 import com.example.btl_tmdt.model.ReviewProduct;
+import com.example.btl_tmdt.model.User; // THÊM IMPORT NÀY
+import com.example.btl_tmdt.service.InteractionLogService; // THÊM IMPORT NÀY
 import com.example.btl_tmdt.service.ReviewProductService;
+import com.example.btl_tmdt.service.UserService; // THÊM IMPORT NÀY
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,12 @@ import java.util.*;
 public class ReviewProductController {
     @Autowired
     private ReviewProductService reviewProductService;
+
+    @Autowired
+    private UserService userService; // THÊM AUTOWIRED NÀY
+
+    @Autowired
+    private InteractionLogService interactionLogService; // THÊM AUTOWIRED NÀY
 
     @GetMapping("/{productId}")
     public ResponseEntity<?> getReviewsByProductId(@PathVariable("productId") String productId) {
@@ -44,13 +53,31 @@ public class ReviewProductController {
     @PostMapping("/add-review")
     public ResponseEntity<?> addReview(@RequestBody ReviewProductDao reviewProductDao) {
         try {
+            // Lấy thông tin người dùng để lấy userId
+            User user = userService.getUserByUserName(reviewProductDao.getUserName());
+            if (user == null) {
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "User not found");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+            }
+
             ReviewProduct reviewProduct = new ReviewProduct();
             reviewProduct.setUserName(reviewProductDao.getUserName());
             reviewProduct.setProductId(reviewProductDao.getProductId());
             reviewProduct.setCreatedDate(LocalDate.now());
             reviewProduct.setRating(reviewProductDao.getRating());
             reviewProduct.setContent(reviewProductDao.getContent());
+            reviewProduct.setStatus("pending"); // Đặt trạng thái mặc định là "pending"
+
             reviewProductService.createReviewProduct(reviewProduct);
+
+            // Ghi log tương tác "REVIEW_PRODUCT"
+            interactionLogService.createInteractionLog(
+                    user.getUserId(),
+                    reviewProductDao.getProductId(),
+                    "REVIEW_PRODUCT",
+                    reviewProductDao.getRating()
+            );
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Review added successfully");
@@ -59,7 +86,7 @@ public class ReviewProductController {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
-            error.put("error", "Error adding review");
+            error.put("error", "Error adding review: " + e.getMessage()); // Thêm chi tiết lỗi
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }

@@ -1,0 +1,7 @@
+flask # hoặc fastapi uvicorn
+pymongo
+pandas
+scikit-learn
+numpy
+scipy
+lightfm
