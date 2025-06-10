@@ -1,5 +1,6 @@
 package com.example.btl_tmdt.service;
 
+import com.example.btl_tmdt.dao.CategoryDao;
 import com.example.btl_tmdt.dao.ProductDao;
 import com.example.btl_tmdt.model.Category;
 import com.example.btl_tmdt.model.Product;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -90,5 +92,13 @@ public class ProductService {
 
     public void updateProduct(Product existingProduct) {
         prodRepo.save(existingProduct);
+    }
+
+    public List<ProductDao> findByCategoryExceptSelf(CategoryDao categoryDao, String prodId, int i) {
+        return prodRepo.findProductsByCategoryAndProdIdNot(categoryDao.toModel(), prodId)
+                .stream()
+                .map(Product::toDao)
+                .limit(i)
+                .toList();
     }
 }

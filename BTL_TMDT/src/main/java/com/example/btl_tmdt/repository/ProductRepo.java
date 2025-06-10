@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,5 +29,11 @@ public interface ProductRepo extends MongoRepository<Product, Integer> {
     List<Product> getProductsByCategory(Category category);
 
     void deleteByProdId(String prodId);
+
+    Product findByCategoryAndProdIdNot(Category category, String prodId);
+
+    List<Product> findProductsByCategoryAndProdIdNot(Category category, String prodId);
+
+
 //    void updateProductByProdId(String prodId, Product product);
 }

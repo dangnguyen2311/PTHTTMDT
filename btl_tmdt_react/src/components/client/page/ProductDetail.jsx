@@ -18,6 +18,16 @@ const ProductDetail = () => {
     const [newReview, setNewReview] = useState("");
     const [images, setImages] = useState([]);
 
+    const [suggestedProducts, setSuggestedProducts] = useState([]);
+
+    useEffect(() => {
+        fetch(`/api/v1/products/suggest?prodId=${id}`)
+            .then(res => res.json())
+            .then(data => setSuggestedProducts(data))
+            .catch(err => console.error("Lỗi khi lấy gợi ý sản phẩm", err));
+    }, [id]);
+
+
 
     // Dữ liệu mẫu
     useEffect(() => {
@@ -41,6 +51,42 @@ const ProductDetail = () => {
         ];
         setReviews(mockReviews);
     }, [id]);
+
+    const renderSuggestedProducts = () => {
+        if (!suggestedProducts || !suggestedProducts.suggested?.length) return null;
+
+        return (
+            <div className="container my-5">
+                <h4 className="mb-4 text-center">Related Products</h4>
+                <div className="row">
+                    {suggestedProducts.suggested.map(product => (
+                        <div key={product.prodId} className="col-6 col-md-4 col-lg-3 mb-4">
+                            <div className="card h-100 text-center p-2">
+                                <img
+                                    src={product.prodImg}
+                                    alt={product.prodName}
+                                    className="card-img-top"
+                                    style={{ height: "150px", objectFit: "contain" }}
+                                />
+                                <div className="card-body">
+                                    <h6>{product.prodName}</h6>
+                                    <p className="text-danger">{product.prodPrice.toLocaleString()} VNĐ</p>
+                                    <button
+                                        className="btn btn-sm btn-outline-primary"
+                                        onClick={() => navigate(`/product-detail/${product.prodId}`)}
+                                    >
+                                        Xem chi tiết
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
+
 
     const handleAddReview = () => {
         if (!newReview.trim()) return;
@@ -210,6 +256,7 @@ const ProductDetail = () => {
                             </div>
                         </div>
                     </div>
+                    {renderSuggestedProducts()}
                     <ProductReview productId={id} userName={userName} />
 
                 </div>

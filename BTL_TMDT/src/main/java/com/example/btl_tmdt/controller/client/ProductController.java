@@ -73,4 +73,18 @@ public class ProductController {
             return ResponseEntity.badRequest().body(Map.of("error", "Lỗi khi lấy chi tiết sản phẩm: " + e.getMessage()));
         }
     }
+    @GetMapping("/suggest")
+    public ResponseEntity<?> getSuggestedProducts(@RequestParam String prodId) {
+        ProductDao currentProduct = productService.getProductById(prodId).toDao();
+        if (currentProduct == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<ProductDao> suggested = productService
+                .findByCategoryExceptSelf(currentProduct.getCategoryDao(), prodId, 2);
+
+        System.out.println("suggested: "+suggested);
+
+        return ResponseEntity.ok(Map.of("suggested", suggested));
+    }
 }
