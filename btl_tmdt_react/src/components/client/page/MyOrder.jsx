@@ -10,7 +10,7 @@ const MyOrder = () => {
     useEffect(() => {
         fetch('/api/v1/checkout/my-order')
             .then((res) => {
-                if (!res.ok) throw new Error('Không thể lấy danh sách đơn hàng');
+                if (!res.ok) throw new Error('Cannot fetch orders');
                 return res.json();
             })
             .then((data) => {
@@ -18,7 +18,7 @@ const MyOrder = () => {
             })
             .catch((err) => {
                 console.error(err);
-                alert('Lỗi khi tải danh sách đơn hàng');
+                alert('Error fetching orders: ' + err.message);
             });
     }, []);
 
@@ -99,7 +99,7 @@ const MyOrder = () => {
                                     ))}
                                     {orders.length === 0 && (
                                         <tr>
-                                            <td colSpan="6" className="text-center">Chưa có đơn hàng nào.</td>
+                                            <td colSpan="6" className="text-center">You don't have any orders.</td>
                                         </tr>
                                     )}
                                     </tbody>

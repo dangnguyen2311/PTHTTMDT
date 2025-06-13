@@ -230,25 +230,6 @@ const EditProduct = () => {
                                        placeholder="Enter company" value={product.prodNsx} onChange={handleChange}/>
                             </div>
 
-                            {/*<div className="form-group">*/}
-                            {/*    <label>Picture</label>*/}
-                            {/*    <input type="file" name="pictureFile" className="form-control-file"*/}
-                            {/*           onChange={handleFileChange} required/>*/}
-                            {/*</div>*/}
-
-                            {/*<div className="form-group">*/}
-                            {/*    <label>Detail Images</label>*/}
-                            {/*    <input*/}
-                            {/*        type="file"*/}
-                            {/*        name="prodDetailImageList"*/}
-                            {/*        className="form-control-file"*/}
-                            {/*        multiple*/}
-                            {/*        onChange={(e) => {*/}
-                            {/*            setDetailFiles(prev => [...prev, ...Array.from(e.target.files)]);*/}
-                            {/*        }}*/}
-                            {/*    />*/}
-                            {/*</div>*/}
-
                             <div className="form-group">
                                 <label>Preview Image</label>
                                 {previewImg && <img src={previewImg} alt="Preview" width="150"/>}

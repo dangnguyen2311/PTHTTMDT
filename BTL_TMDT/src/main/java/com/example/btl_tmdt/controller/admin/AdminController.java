@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,8 @@ public class AdminController {
     private ReviewProductService reviewProductService;
     @Autowired
     private ReturnOrderService returnOrderService;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     HttpSession session;
@@ -57,7 +60,6 @@ public class AdminController {
         List<ReviewProductDao> reviewProductDaos = reviewProductService.getAllReviews().stream().filter(review -> !"deleted".equalsIgnoreCase(review.getStatus())).map(ReviewProduct::toDao).toList();
         List<ReturnOrderDao> returnOrderDaos = returnOrderService.getAllReturnOrders();
 
-
         Map<String, Integer> dashboardData = new HashMap<>();
         dashboardData.put("numberOfProduct", products.size());
         dashboardData.put("numberOfCart", carts.size());
@@ -70,40 +72,30 @@ public class AdminController {
         return ResponseEntity.ok(dashboardData);
     }
 
-    // Endpoint to handle login
     @PostMapping("/login")
     public ResponseEntity<?> adminLoginPost(@RequestBody User user) {
         User userByUserName = userService.getUserByUserName(user.getUserName());
-        System.out.println("Admin dang nhap: "+user.getUserName());
-        if(userByUserName == null){
+        System.out.println("Admin đăng nhập: " + user.getUserName());
+
+        if (userByUserName == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
-        if(!userByUserName.getUserRole().equals("2")) {
+
+        if (!"2".equals(userByUserName.getUserRole())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed, user is not admin");
         }
-        else{
-            return ResponseEntity.ok(Map.of(
-                    "message", "Login successfully",
-                    "adminName", userByUserName.getUserName()
-            ));
+
+        if (!passwordEncoder.matches(user.getUserPass(), userByUserName.getUserPass())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed, wrong password");
         }
 
-
-//        if (user1 != null || user2 != null) {
-//            assert user1 != null;
-//            if (user1.getUserPass().equals(user.getUserPass()) || user2.getUserPass().equals(user.getUserPass())) {
-//                if (user.getUserRole().equals("1"))
-//                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Login failed, user is not admin");
-//                return ResponseEntity.ok(Map.of(
-//                        "message", "Login successfully",
-//                        "adminName", user1.getUserName()
-//                ));
-//            }
-//        }
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Login failed");
+        return ResponseEntity.ok(Map.of(
+                "message", "Login successfully",
+                "adminName", userByUserName.getUserName()
+        ));
     }
 
-    // Endpoint to handle logout
+
     @GetMapping("/logout")
     public ResponseEntity<String> adminLogout() {
         session.removeAttribute("userName");

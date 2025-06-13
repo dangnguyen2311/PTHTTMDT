@@ -277,21 +277,19 @@ public class AdminProductController {
             @ModelAttribute ProductDao productDao,
             @RequestPart(value = "prodDetailImageList", required = false) String prodDetailImageListJson
     ) {
-        // Kiểm tra sản phẩm tồn tại
         Product existingProduct = productService.getProductById(id);
+        CategoryDao categoryDao = categoryService.getCategoryById(productDao.getCategoryDao().getId()).get().toDao();
         if (existingProduct == null) {
             return ResponseEntity.badRequest().body("Product not found");
         }
-
-        // Cập nhật thông tin sản phẩm
         existingProduct.setProdName(productDao.getProdName());
         existingProduct.setProdDescription(productDao.getProdDescription());
         existingProduct.setProdPrice(productDao.getProdPrice());
         existingProduct.setProdNsx(productDao.getProdNsx());
         existingProduct.setCategory(productDao.getCategoryDao().toModel());
         existingProduct.setProdImg(productDao.getProdImg());
+        existingProduct.setCategory(categoryDao.toModel());
 
-        // Xử lý prodDetailImageList từ chuỗi JSON
         if (prodDetailImageListJson != null && !prodDetailImageListJson.isEmpty()) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();

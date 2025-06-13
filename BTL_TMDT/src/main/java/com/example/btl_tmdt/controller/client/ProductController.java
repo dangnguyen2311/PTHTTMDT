@@ -81,7 +81,7 @@ public class ProductController {
         }
 
         List<ProductDao> suggested = productService
-                .findByCategoryExceptSelf(currentProduct.getCategoryDao(), prodId, 2);
+                .findByCategoryExceptSelf(currentProduct.getCategoryDao(), prodId, 4);
 
         System.out.println("suggested: "+suggested);
 

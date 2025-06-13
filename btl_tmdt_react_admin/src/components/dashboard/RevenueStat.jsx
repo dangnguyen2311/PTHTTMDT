@@ -80,7 +80,7 @@ export const RevenueStat = () => {
                                 <tbody>
                                 {orders.map(order => (
                                     <tr key={order.orderId}>
-                                        <td>{order.order_time}</td>
+                                        <td>{order.orderTime}</td>
                                         <td>{order.userDao.userName}</td>
                                         <td>{order.total} VNĐ</td>
                                         <td>{order.status}</td>

@@ -44,38 +44,104 @@ const App = () => {
                         </RedirectIfLoggedIn>
                     }
                 />
-            <Route path="/" element={
+            <Route path="" element={
                 <PrivateRoute>
                     <Dashboard />
                 </PrivateRoute>
             } />
-            <Route path={"/logout"} element={<Logout/>}></Route>
+            <Route path={"/logout"} element={
+                <PrivateRoute>
+                    <Logout/>
+                </PrivateRoute>
+            }/>
 
-            <Route path="/category" element={<Categories/>}/>
-            <Route path="/category/add-category" element={<AddCategory/>}/>
-            <Route path="/category/edit-category/:id" element={<EditCategory/>}/>
-            <Route path="/category/delete-category/:id" element={<Categories/>}/>
-            
+            <Route path="/category" element={
+                <PrivateRoute>
+                    <Categories />
+                </PrivateRoute>
+            } />
+            <Route path="/category/add-category" element={
+                <PrivateRoute>
+                    <AddCategory />
+                </PrivateRoute>
+            } />
+            <Route path="/category/edit-category/:id" element={
+                <PrivateRoute>
+                    <EditCategory />
+                </PrivateRoute>
+            } />
+            <Route path="/category/delete-category/:id" element={
+                <PrivateRoute>
+                    <Categories />
+                </PrivateRoute>
+            } />
 
-            <Route path="/cart" element={<CartManagement />} />
-            <Route path="/cart/cart-item/:id" element={<CartItems/>} />
+            <Route path="/cart" element={
+                <PrivateRoute>
+                    <CartManagement />
+                </PrivateRoute>
+            } />
+            <Route path="/cart/cart-item/:id" element={
+                <PrivateRoute>
+                    <CartItems />
+                </PrivateRoute>
+            } />
 
+            <Route path="/product" element={
+                <PrivateRoute>
+                    <ListProduct />
+                </PrivateRoute>
+            } />
+            <Route path="/product/add-product" element={
+                <PrivateRoute>
+                    <AddProduct />
+                </PrivateRoute>
+            } />
+            <Route path="/product/edit-product/:id" element={
+                <PrivateRoute>
+                    <EditProduct />
+                </PrivateRoute>
+            } />
 
-            <Route path="/product" element={<ListProduct/>} />
-            <Route path="/product/add-product" element={<AddProduct/>} />
-            <Route path="/product/edit-product/:id" element={<EditProduct/>} />
+            <Route path="/order" element={
+                <PrivateRoute>
+                    <OrderListPage />
+                </PrivateRoute>
+            } />
+            <Route path="/order/order-item/:id" element={
+                <PrivateRoute>
+                    <OrderItemsPage />
+                </PrivateRoute>
+            } />
 
-            <Route path="/order" element={<OrderListPage/>}/>
-            <Route path="/order/order-item/:id" element={<OrderItemsPage />}/>
+            <Route path="/user" element={
+                <PrivateRoute>
+                    <ListUser />
+                </PrivateRoute>
+            } />
+            <Route path="/user/add-user" element={
+                <PrivateRoute>
+                    <AddUser />
+                </PrivateRoute>
+            } />
+            <Route path="/user/edit-user/:id" element={
+                <PrivateRoute>
+                    <EditUser />
+                </PrivateRoute>
+            } />
 
-            <Route path="/user" element={<ListUser/>}/>
-            <Route path="/user/add-user" element={<AddUser/>}/>
-            <Route path="/user/edit-user/:id" element={<EditUser/>}/>
+            <Route path="/review" element={
+                <PrivateRoute>
+                    <ReviewList />
+                </PrivateRoute>
+            } />
 
-            <Route path={"/review"} element={<ReviewList/>}></Route>
+            <Route path="/return" element={
+                <PrivateRoute>
+                    <ReturnOrder />
+                </PrivateRoute>
+            } />
 
-            <Route path="/return" element={<ReturnOrder />} />
-            {/* các route admin khác... */}
         </Routes>
     );
 };

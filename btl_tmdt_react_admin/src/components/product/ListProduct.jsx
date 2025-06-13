@@ -107,7 +107,7 @@ const ProductList = () => {
                                         {products.map((product) => (
                                             <tr key={product.prodId}>
                                                 <td>{product.prodName}</td>
-                                                <td>{product.categoryDao.category_name}</td>
+                                                <td>{product.categoryDao.categoryName}</td>
                                                 <td>{product.prodPrice.toLocaleString("vi-VN")} VNĐ</td>
                                                 <td>{product.prodDescription}</td>
                                                 <td>

@@ -24,7 +24,7 @@ export const FavouriteProduct = ({ product }) => {
                     setFavouriteProductId(null);
                 }
             } catch (error) {
-                console.error("Lỗi khi kiểm tra sản phẩm yêu thích:", error);
+                console.error("Error when fetching favourite products:", error);
             } finally {
                 setLoading(false);
             }

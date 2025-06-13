@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,8 @@ import java.util.stream.Collectors;
 public class AdminUserController {
     @Autowired
     UserService userService;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
     @Autowired
     HttpSession session;
     private boolean checkUser() {
@@ -55,7 +58,6 @@ public class AdminUserController {
         return ResponseEntity.ok(user.toDao());
     }
 
-    // Thêm user mới
     @PostMapping("")
     public ResponseEntity<?> addNewUser(@RequestBody UserDao userDao) {
         User existingUsername = userService.getUserByUserName(userDao.getUserName());
@@ -66,16 +68,22 @@ public class AdminUserController {
                     .body("Username or Email already exist");
         }
 
+        String encodedPassword = passwordEncoder.encode(userDao.getUserPass());
+        userDao.setUserPass(encodedPassword);
+
         userService.saveUser(userDao.toModel());
         return ResponseEntity.status(HttpStatus.CREATED).body("User created successfully");
     }
 
-    // Cập nhật user
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody UserDao userDao) {
+        String encodedPassword = passwordEncoder.encode(userDao.getUserPass());
+        userDao.setUserPass(encodedPassword);
         userService.updateUser(userDao);
         return ResponseEntity.ok("User updated successfully");
     }
+
 
     // Xóa user
     @DeleteMapping("/{id}")

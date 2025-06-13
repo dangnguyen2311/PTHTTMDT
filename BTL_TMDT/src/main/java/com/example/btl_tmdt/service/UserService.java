@@ -81,14 +81,15 @@ public class UserService {
     public void updateUser(UserDao userDao) {
         User userOld = userRepo.getUserByUserName(userDao.getUserName());
         if (userOld != null) {
-            updateUserInfo(userOld.getUserId(), userDao.getUserFullName(), userDao.getUserPhone(), userDao.getUserAddress());
+            updateUserInfo(userOld.getUserId(), userDao.getUserFullName(),userDao.getUserPass(), userDao.getUserPhone(), userDao.getUserAddress());
         }
     }
 
-    public void updateUserInfo(String userId, String fullName, String phone, String address) {
+    public void updateUserInfo(String userId, String fullName, String userPass, String phone, String address) {
         Query query = new Query(Criteria.where("userId").is(userId));
         Update update = new Update()
                 .set("userFullName", fullName)
+                .set("userPass", userPass)
                 .set("userPhone", phone)
                 .set("userAddress", address);
         mongoTemplate.updateFirst(query, update, User.class);

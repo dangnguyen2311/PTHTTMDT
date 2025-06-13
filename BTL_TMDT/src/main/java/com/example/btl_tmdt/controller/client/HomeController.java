@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,9 @@ public class HomeController {
 
     @Autowired
     ProductService productService;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
 
     @GetMapping("/")
@@ -103,7 +107,7 @@ public class HomeController {
         }
 
         List<ProductDao> selectedProducts = listPage.get(Math.min(id - 1, listPage.size() - 1));
-//        Collections.shuffle(selectedProducts); // nếu muốn ngẫu nhiên
+        Collections.shuffle(selectedProducts); // nếu muốn ngẫu nhiên
 
         return ResponseEntity.ok(Map.of(
                 "productDaos", selectedProducts,
@@ -146,11 +150,11 @@ public class HomeController {
 //        }
 //        return "client/login";
 //    }
-    @PostMapping("/login") // ĐÃ SỬA
+    @PostMapping("/login")
     public ResponseEntity<?> loginPost(@RequestBody Map<String, String> loginRequest) {
         String loginInput = loginRequest.get("userLogin"); // Có thể là email hoặc username
         String password = loginRequest.get("userPass");
-        System.out.println(loginInput + ": " + password);
+
         if (loginInput == null || password == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "Missing login info"));
         }
@@ -160,20 +164,21 @@ public class HomeController {
             user = userService.getUserByEmail(loginInput);
         }
 
-        if (user == null || !user.getUserPass().equals(password)) {
+        // So sánh password bằng BCrypt
+        if (user == null || !passwordEncoder.matches(password, user.getUserPass())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Login failed"));
         }
 
         // Lưu session
         session.setAttribute("userName", user.getUserName());
+
         List<CategoryDao> categoryDaos = categoryService.getCategories()
                 .stream()
                 .map(Category::toDao)
                 .toList();
-        // Trả về đường redirect dựa trên role
+
         String redirectUrl = "2".equals(user.getUserRole()) ? "/admin" : "/slide/1";
-        System.out.println("redirectUrl" + redirectUrl + ",   " + user.getUserRole());
 
         return ResponseEntity.ok(Map.of(
                 "message", "Login successful",
@@ -183,6 +188,7 @@ public class HomeController {
                 "categoryDaos", categoryDaos
         ));
     }
+
 
 
 //    @GetMapping("/")
@@ -222,10 +228,10 @@ public class HomeController {
 //
 //        return "redirect:/login";
 //    }
-    @PostMapping("/register") // ĐÃ SỬA
+    @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserDao userDao) {
-        userDao.setUserRole("1"); // gán mặc định role là 1 - khách hàng
-        System.out.println(userDao.getUserName());
+        userDao.setUserRole("1"); // Mặc định role là khách hàng
+
         User userByEmail = userService.getUserByEmail(userDao.getUserEmail());
         User userByUsername = userService.getUserByUserName(userDao.getUserName());
 
@@ -236,9 +242,14 @@ public class HomeController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        // Lưu user
         try {
-            userService.createUser(userDao.toModel());
+            User user = userDao.toModel();
+
+            // Mã hóa mật khẩu trước khi lưu
+            String encodedPassword = passwordEncoder.encode(user.getUserPass());
+            user.setUserPass(encodedPassword);
+
+            userService.createUser(user);
             response.put("message", "Đăng ký thành công.");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -246,6 +257,7 @@ public class HomeController {
             return ResponseEntity.status(500).body(response);
         }
     }
+
 
 
     @PostMapping("/logout")

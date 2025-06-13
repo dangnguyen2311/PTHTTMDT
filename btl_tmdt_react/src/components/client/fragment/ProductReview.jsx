@@ -30,7 +30,7 @@ const ProductReview = ({ productId, userName }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!content.trim()) {
-            setError("Vui lòng nhập nội dung đánh giá!");
+            setError("Please write your review!");
             return;
         }
         const newReview = {
@@ -56,7 +56,7 @@ const ProductReview = ({ productId, userName }) => {
             setStarpoint(5);
             fetchReviews();
         } catch (err) {
-            alert("Lỗi khi gửi đánh giá. Vui lòng thử lại!" + err);
+            alert("Error while sending review. Please try again!" + err);
         }
     };
 

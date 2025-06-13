@@ -27,16 +27,16 @@ function App() {
     const isLoggedIn = !!localStorage.getItem("userName");
     console.log("User is logged in:", isLoggedIn + ", UserName:", localStorage.getItem("userName"));
 
-    const isAdminAuthenticated = () => {
-        return !!localStorage.getItem("adminName");
+    const isUserAuthenticated = () => {
+        return !!localStorage.getItem("userName");
     };
 
     const PrivateRoute = ({ children }) => {
-        return isAdminAuthenticated() ? children : <Navigate to="/login" />;
+        return isUserAuthenticated() ? children : <Navigate to="/login" />;
     };
 
-    const RedirectIfLoggedIn = ({ children }) => { // dungf trong Login
-        return isAdminAuthenticated() ? <Navigate to="/dashboard" /> : children;
+    const RedirectIfLoggedIn = ({ children }) => {
+        return isUserAuthenticated() ? <Navigate to="/" /> : children;
     };
 
     return (
@@ -47,29 +47,79 @@ function App() {
                 {/*    path="/"*/}
                 {/*    element={isLoggedIn ? <Navigate to="/slide/1" replace /> : <Navigate to="/login" replace />}*/}
                 {/*/>*/}
-                <Route path={"/"} element={<Navigate to={"/slide/1"}/>}/>
+                <Route path="/" element={<Navigate to="/slide/1" />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/slide/:id" element={<Home />} />
-                <Route path="/search" element={<SearchResults />} />
                 <Route path="/register" element={<RegisterForm />} />
-                <Route path="/my-cart" element={
-                    isLoggedIn ? <Cart /> :
-                        <Navigate to="/login" replace />
+                <Route path="/slide/:id" element={<PrivateRoute><Home /></PrivateRoute>} />
+                <Route path="/search" element={<PrivateRoute><SearchResults /></PrivateRoute>} />
+                <Route path="/category/:name" element={
+                    <PrivateRoute>
+                        <Category />
+                    </PrivateRoute>
                 } />
-                <Route path="/logout" element={<Logout />} />
+                <Route path="/product-detail/:id" element={
+                    <PrivateRoute>
+                        <ProductDetail />
+                    </PrivateRoute>
 
-                <Route path="/category/:name" element={<Category/>}></Route>
-                <Route path={"/product-detail/:id"} element={<ProductDetail/>}></Route>
+                } />
 
-                <Route path="/checkout" element={<Checkout/>}/>
-                <Route path="/my-order" element={<MyOrder />} />
-                <Route path="/my-order/detail/:orderId" element={<OrderDetail />} />
-                <Route path="/my-order/return/:orderId" element={<Return/>}></Route>
-                <Route path="/payment" element={<Payment/>}/>
-                <Route path="/user-detail" element={<UserDetail/>}></Route>
-                <Route path="/admin" element={<Dashboard />} />
-                <Route path="/admin/cart" element={<CartManagement/>} />
-                <Route path="/admin/cart/cart-item/:id" element={<CartItems/>} />
+                <Route path="/my-cart" element={
+                    <PrivateRoute>
+                        <Cart />
+                    </PrivateRoute>
+                } />
+                <Route path="/logout" element={
+                    <Logout />
+                } />
+
+                <Route path="/checkout" element={
+                    <PrivateRoute>
+                        <Checkout />
+                    </PrivateRoute>
+                } />
+                <Route path="/my-order" element={
+                    <PrivateRoute>
+                        <MyOrder />
+                    </PrivateRoute>
+                } />
+                <Route path="/my-order/detail/:orderId" element={
+                    <PrivateRoute>
+                        <OrderDetail />
+                    </PrivateRoute>
+                } />
+                <Route path="/my-order/return/:orderId" element={
+                    <PrivateRoute>
+                        <Return />
+                    </PrivateRoute>
+                } />
+                <Route path="/payment" element={
+                    <PrivateRoute>
+                        <Payment />
+                    </PrivateRoute>
+                } />
+                <Route path="/user-detail" element={
+                    <PrivateRoute>
+                        <UserDetail />
+                    </PrivateRoute>
+                } />
+
+                <Route path="/admin" element={
+                    <PrivateRoute>
+                        <Dashboard />
+                    </PrivateRoute>
+                } />
+                <Route path="/admin/cart" element={
+                    <PrivateRoute>
+                        <CartManagement />
+                    </PrivateRoute>
+                } />
+                <Route path="/admin/cart/cart-item/:id" element={
+                    <PrivateRoute>
+                        <CartItems />
+                    </PrivateRoute>
+                } />
+
                 {/*</AppWrapper>*/}
 
             </Routes>
